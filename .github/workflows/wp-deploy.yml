@@ -1,0 +1,50 @@
+name: Deploy to WordPress.org
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    name: Deploy to WP.org SVN
+    runs-on: ubuntu-latest
+    environment: wordpress-org
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify version consistency
+        run: |
+          PLUGIN_VERSION=$(grep -oP "Version:\s*\K[0-9.]+" link-smartly/link-smartly.php)
+          STABLE_TAG=$(grep -oP "Stable tag:\s*\K[0-9.]+" link-smartly/readme.txt)
+          CONSTANT_VERSION=$(grep -oP "define\(\s*'LSM_VERSION',\s*'\K[0-9.]+" link-smartly/link-smartly.php)
+          TAG_VERSION="${GITHUB_REF#refs/tags/}"
+          TAG_VERSION="${TAG_VERSION#v}"
+
+          echo "Plugin header: $PLUGIN_VERSION"
+          echo "Stable tag:    $STABLE_TAG"
+          echo "Constant:      $CONSTANT_VERSION"
+          echo "Git tag:       $TAG_VERSION"
+
+          if [ "$PLUGIN_VERSION" != "$STABLE_TAG" ] || [ "$PLUGIN_VERSION" != "$CONSTANT_VERSION" ] || [ "$PLUGIN_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Version mismatch detected! All versions must match."
+            exit 1
+          fi
+
+      - name: Generate POT file
+        run: |
+          sudo apt-get install -y gettext
+          npm install -g @wordpress/env @wp-now/wp-now || true
+          # Fallback: use wp-cli if available
+          curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          chmod +x wp-cli.phar
+          php wp-cli.phar i18n make-pot link-smartly/ link-smartly/languages/link-smartly.pot --slug=link-smartly --domain=link-smartly --skip-js
+
+      - name: Deploy to WordPress.org
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SLUG: link-smartly
+          BUILD_DIR: link-smartly

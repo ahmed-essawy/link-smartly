@@ -1,0 +1,32 @@
+name: Release ZIP
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build and attach ZIP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create clean plugin ZIP
+        run: |
+          # Copy only the plugin directory (no dev files)
+          mkdir -p build
+          cp -r link-smartly build/link-smartly
+
+          # Remove any dev/hidden files that slipped in
+          find build/link-smartly -name '.*' -delete 2>/dev/null || true
+
+          # Create ZIP
+          cd build
+          zip -r ../link-smartly.zip link-smartly/
+
+      - name: Upload ZIP to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: link-smartly.zip

@@ -1,0 +1,56 @@
+---
+name: Feature Request
+description: Suggest a new feature or enhancement for Link Smartly
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting how to improve Link Smartly! Please describe your idea below.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: Describe the problem this feature would solve, or the use case it enables.
+      placeholder: I want to be able to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe how you'd like this to work.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any alternative solutions or workarounds you've considered.
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Feature scope
+      options:
+        - Admin UI improvement
+        - New linking rule
+        - Import/Export enhancement
+        - Developer hook or filter
+        - Performance improvement
+        - Compatibility with another plugin
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues and this feature has not been requested before.
+          required: true

@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<ruleset name="Link Smartly">
+	<description>PHPCS ruleset for the Link Smartly WordPress plugin.</description>
+
+	<!-- Scan only the plugin directory -->
+	<file>./link-smartly/</file>
+
+	<!-- Exclude index.php "silence is golden" files -->
+	<exclude-pattern>*/index.php</exclude-pattern>
+
+	<!-- Only check PHP files -->
+	<arg name="extensions" value="php"/>
+
+	<!-- Show sniff codes in reports -->
+	<arg value="sp"/>
+
+	<!-- Use colors in output -->
+	<arg name="colors"/>
+
+	<!-- Check up to 8 files simultaneously -->
+	<arg name="parallel" value="8"/>
+
+	<!-- WordPress Coding Standards -->
+	<rule ref="WordPress">
+		<!-- Allow short array syntax [] -->
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+	</rule>
+
+	<!-- Enforce text domain -->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="link-smartly"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Enforce function/class/constant prefixes -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="lsm_"/>
+				<element value="Lsm_"/>
+				<element value="LSM_"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- PHP compatibility — 8.0+ -->
+	<rule ref="PHPCompatibilityWP"/>
+	<config name="testVersion" value="8.0-"/>
+
+	<!-- WordPress minimum version -->
+	<config name="minimum_wp_version" value="6.0"/>
+</ruleset>

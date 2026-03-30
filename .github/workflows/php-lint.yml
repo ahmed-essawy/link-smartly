@@ -1,0 +1,32 @@
+name: PHP Lint
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '**.php'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - '**.php'
+
+jobs:
+  lint:
+    name: PHP ${{ matrix.php-version }} Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['8.0', '8.1', '8.2', '8.3']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: php-parallel-lint/php-parallel-lint
+
+      - name: Run PHP lint
+        run: parallel-lint --exclude vendor link-smartly/

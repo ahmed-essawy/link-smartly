@@ -1,0 +1,30 @@
+{
+  "name": "minicad-io/link-smartly",
+  "description": "Auto-internal-linking WordPress plugin. Converts keyword occurrences into internal links based on user-defined mappings.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://github.com/minicad-io/link-smartly",
+  "authors": [
+    {
+      "name": "Ahmed Essawy",
+      "homepage": "https://minicad.io"
+    }
+  ],
+  "require": {
+    "php": ">=8.0"
+  },
+  "require-dev": {
+    "wp-coding-standards/wpcs": "^3.0",
+    "phpcompatibility/phpcompatibility-wp": "*",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "scripts": {
+    "phpcs": "phpcs",
+    "phpcbf": "phpcbf"
+  }
+}

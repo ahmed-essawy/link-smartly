@@ -1,0 +1,36 @@
+name: WordPress Coding Standards
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '**.php'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - '**.php'
+
+jobs:
+  phpcs:
+    name: PHPCS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: cs2pr, composer
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHPCS
+        run: vendor/bin/phpcs --report-full --report-checkstyle=./phpcs-report.xml
+
+      - name: Show PHPCS results in PR
+        if: always() && github.event_name == 'pull_request'
+        run: cs2pr ./phpcs-report.xml

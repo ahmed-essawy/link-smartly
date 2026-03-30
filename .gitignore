@@ -1,0 +1,39 @@
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE / Editor
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Composer
+/vendor/
+composer.lock
+
+# Node (if added later)
+/node_modules/
+package-lock.json
+
+# WordPress
+wp-config.php
+wp-content/uploads/
+
+# Build artifacts
+*.zip
+/dist/
+/build/
+
+# Logs
+*.log
+debug.log
+error_log
+
+# Environment
+.env
+.env.local
