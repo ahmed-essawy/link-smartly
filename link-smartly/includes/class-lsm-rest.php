@@ -132,6 +132,39 @@ class Lsm_Rest {
 				'permission_callback' => array( $this, 'check_permissions' ),
 			)
 		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/health',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_health_summary' ),
+					'permission_callback' => array( $this, 'check_permissions' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'run_health_check' ),
+					'permission_callback' => array( $this, 'check_permissions' ),
+					'args'                => array(
+						'offset' => array(
+							'type'    => 'integer',
+							'default' => 0,
+						),
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/health/broken',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_broken_urls' ),
+				'permission_callback' => array( $this, 'check_permissions' ),
+			)
+		);
 	}
 
 	/**
@@ -331,6 +364,50 @@ class Lsm_Rest {
 			),
 			200
 		);
+	}
+
+	/**
+	 * Get URL health summary.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param WP_REST_Request $request The request.
+	 * @return WP_REST_Response Response with health summary.
+	 */
+	public function get_health_summary( WP_REST_Request $request ): WP_REST_Response {
+		$health = new Lsm_Health( $this->keywords );
+
+		return new WP_REST_Response( $health->get_summary(), 200 );
+	}
+
+	/**
+	 * Run a batch health check on keyword URLs.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param WP_REST_Request $request The request.
+	 * @return WP_REST_Response Response with check results.
+	 */
+	public function run_health_check( WP_REST_Request $request ): WP_REST_Response {
+		$offset = absint( $request->get_param( 'offset' ) );
+		$health = new Lsm_Health( $this->keywords );
+		$result = $health->check_urls( $offset );
+
+		return new WP_REST_Response( $result, 200 );
+	}
+
+	/**
+	 * Get keywords with broken URLs.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param WP_REST_Request $request The request.
+	 * @return WP_REST_Response Response with broken keywords.
+	 */
+	public function get_broken_urls( WP_REST_Request $request ): WP_REST_Response {
+		$health = new Lsm_Health( $this->keywords );
+
+		return new WP_REST_Response( $health->get_broken_keywords(), 200 );
 	}
 
 	/**

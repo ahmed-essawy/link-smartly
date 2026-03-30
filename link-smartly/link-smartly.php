@@ -3,7 +3,7 @@
  * Plugin Name:       Link Smartly
  * Plugin URI:        https://minicad.io/link-smartly/
  * Description:       Automatically insert internal links into your content based on keyword-to-URL mappings. Lightweight, cache-friendly, and SEO-focused.
- * Version:           1.1.0
+ * Version:           1.2.0
  * Author:            Ahmed Essawy
  * Author URI:        https://minicad.io
  * License:           GPL-2.0-or-later
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  * @var string
  */
-define( 'LSM_VERSION', '1.1.0' );
+define( 'LSM_VERSION', '1.2.0' );
 
 /**
  * Plugin file path constant.
@@ -70,9 +70,11 @@ require_once LSM_PLUGIN_DIR . 'includes/class-lsm-linker.php';
 require_once LSM_PLUGIN_DIR . 'includes/class-lsm-meta-box.php';
 require_once LSM_PLUGIN_DIR . 'includes/class-lsm-cli.php';
 require_once LSM_PLUGIN_DIR . 'includes/class-lsm-rest.php';
+require_once LSM_PLUGIN_DIR . 'includes/class-lsm-health.php';
 require_once LSM_PLUGIN_DIR . 'admin/class-lsm-admin.php';
 require_once LSM_PLUGIN_DIR . 'admin/class-lsm-csv.php';
 require_once LSM_PLUGIN_DIR . 'admin/class-lsm-preview.php';
+require_once LSM_PLUGIN_DIR . 'admin/class-lsm-ajax.php';
 
 register_activation_hook( __FILE__, array( 'Lsm_Activator', 'activate' ) );
 
@@ -173,6 +175,23 @@ function lsm_boot_rest(): void {
 	$rest->init();
 }
 add_action( 'plugins_loaded', 'lsm_boot_rest' );
+
+/**
+ * Boot the AJAX handlers for keyword management.
+ *
+ * @since 1.2.0
+ *
+ * @return void
+ */
+function lsm_boot_ajax(): void {
+	if ( ! is_admin() ) {
+		return;
+	}
+
+	$ajax = new Lsm_Ajax( new Lsm_Keywords() );
+	$ajax->init();
+}
+add_action( 'plugins_loaded', 'lsm_boot_ajax' );
 
 /**
  * Register WP-CLI commands if running in CLI mode.

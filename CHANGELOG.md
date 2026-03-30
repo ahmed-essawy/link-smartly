@@ -4,6 +4,30 @@ All notable changes to Link Smartly will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-07-13
+
+### Added
+
+- **AJAX keyword CRUD**: Add, edit, delete, and toggle keywords without page reloads. Existing form-based handlers preserved as no-JS fallback.
+- **Server-side pagination**: Keywords table now paginates via AJAX with configurable per-page (25/50/100).
+- **Sortable columns**: Click keyword table headers (Keyword, URL, Group, Status, Links) to sort ascending/descending.
+- **Debounced search**: Search and filter keywords on the keywords tab with 300ms debounced AJAX requests.
+- **URL health checker**: Batch-check all keyword target URLs for broken links (HTTP HEAD requests with rate limiting at 5 req/sec).
+- **Health badges**: Visual status indicators (OK/Redirect/Error/Unknown) for keyword URLs in localized data.
+- **Health summary**: Dashboard-style cards showing counts of OK, redirect, error, and unchecked URLs.
+- **REST API health endpoints**: `GET /health` for summary, `POST /health` to run checks, `GET /health/broken` for broken URLs.
+- **WP-CLI `check-urls` command**: Check health of all keyword URLs from the command line with progress bar and status filtering.
+- **Undo on AJAX delete**: Deleted keywords stored in transient for 5-minute undo window (AJAX handler).
+- **AJAX bulk actions**: Bulk activate, deactivate, and delete without page reloads.
+
+### Changed
+
+- Admin JavaScript completely rewritten with AJAX-powered CRUD, pagination, sorting, and search/filter — progressive enhancement over existing form markup.
+- Keywords table headers are now clickable for column sorting with visual arrow indicators.
+- Table footer added with pagination controls and per-page selector.
+- Filter bar elements received CSS classes for JS targeting (`lsm-filter-group`, `lsm-filter-status`, `lsm-clear-filters`).
+- `wp_localize_script` expanded with new strings for AJAX UI and health results.
+
 ## [1.1.0] - 2025-07-12
 
 ### Added
@@ -61,5 +85,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Uninstall cleanup removes all plugin data.
 - Vanilla JS admin interface — no jQuery dependency.
 
+[1.2.0]: https://github.com/minicad-io/link-smartly/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/minicad-io/link-smartly/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/minicad-io/link-smartly/releases/tag/v1.0.0

@@ -295,6 +295,17 @@
 	color: #a7aaad;
 }
 
+/* Warning description */
+.lsm-desc-warning {
+	color: #996800;
+	font-weight: 500;
+}
+
+/* Inline label spacing (used for "New tab:" / "Until:" next to selects/inputs) */
+.lsm-kw-inline-label {
+	margin-left: 15px;
+}
+
 /* Synonyms label */
 .lsm-synonyms-label {
 	font-size: 12px;
@@ -439,8 +450,264 @@
 	font-size: 14px;
 }
 
-/* Responsive */
+/* Sortable column headers */
+.lsm-sortable {
+	cursor: pointer;
+	-webkit-user-select: none;
+	user-select: none;
+	white-space: nowrap;
+}
+
+.lsm-sortable:hover {
+	color: #135e96;
+}
+
+.lsm-sort-arrow {
+	display: inline-block;
+	margin-left: 4px;
+	font-size: 10px;
+	color: #a7aaad;
+	vertical-align: middle;
+}
+
+.lsm-sort-arrow::after {
+	content: "\25B4\25BE";
+	letter-spacing: -2px;
+}
+
+.lsm-sorted .lsm-sort-arrow {
+	color: #1d2327;
+}
+
+.lsm-sorted-asc .lsm-sort-arrow::after {
+	content: "\25B4";
+}
+
+.lsm-sorted-desc .lsm-sort-arrow::after {
+	content: "\25BE";
+}
+
+/* Table footer — pagination + per-page */
+.lsm-table-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: 12px;
+	padding: 8px 0;
+}
+
+/* Pagination */
+.lsm-pagination {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	flex-wrap: wrap;
+}
+
+.lsm-page-link {
+	display: inline-block;
+	min-width: 28px;
+	padding: 4px 8px;
+	border: 1px solid #dcdcde;
+	border-radius: 3px;
+	background: #fff;
+	color: #2271b1;
+	text-align: center;
+	text-decoration: none;
+	font-size: 13px;
+	line-height: 1.4;
+	cursor: pointer;
+}
+
+.lsm-page-link:hover {
+	background: #f0f6fc;
+	border-color: #2271b1;
+	color: #135e96;
+}
+
+.lsm-page-current {
+	background: #2271b1;
+	border-color: #2271b1;
+	color: #fff;
+	cursor: default;
+}
+
+.lsm-page-current:hover {
+	background: #2271b1;
+	border-color: #2271b1;
+	color: #fff;
+}
+
+.lsm-page-dots {
+	display: inline-block;
+	padding: 4px 2px;
+	color: #646970;
+	font-size: 13px;
+}
+
+.lsm-page-info {
+	font-size: 13px;
+	color: #646970;
+	margin-right: 8px;
+}
+
+/* Per-page selector */
+.lsm-per-page-wrap {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	color: #646970;
+}
+
+.lsm-per-page-select {
+	min-width: 60px;
+	padding: 2px 4px;
+}
+
+/* AJAX notice */
+.lsm-ajax-notice {
+	padding: 10px 16px;
+	margin: 10px 0;
+	border: 1px solid #c3c4c7;
+	border-left-width: 4px;
+	border-radius: 2px;
+	font-size: 13px;
+}
+
+.lsm-ajax-notice-success {
+	background: #f0f6fc;
+	border-left-color: #00a32a;
+}
+
+.lsm-ajax-notice-error {
+	background: #fcf0f1;
+	border-left-color: #d63638;
+}
+
+.lsm-ajax-notice-info {
+	background: #f0f6fc;
+	border-left-color: #72aee6;
+}
+
+/* Health badges */
+.lsm-health-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.6;
+	white-space: nowrap;
+}
+
+.lsm-health-ok {
+	background: #edfaef;
+	color: #00a32a;
+}
+
+.lsm-health-redirect {
+	background: #fcf9e8;
+	color: #996800;
+}
+
+.lsm-health-error {
+	background: #fcf0f1;
+	color: #d63638;
+}
+
+.lsm-health-unknown {
+	background: #f0f0f1;
+	color: #646970;
+}
+
+.lsm-health-dot {
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+}
+
+.lsm-health-ok .lsm-health-dot {
+	background: #00a32a;
+}
+
+.lsm-health-redirect .lsm-health-dot {
+	background: #dba617;
+}
+
+.lsm-health-error .lsm-health-dot {
+	background: #d63638;
+}
+
+.lsm-health-unknown .lsm-health-dot {
+	background: #a7aaad;
+}
+
+/* Health summary cards */
+.lsm-health-summary {
+	display: flex;
+	gap: 15px;
+	margin: 15px 0;
+}
+
+.lsm-health-card {
+	flex: 1;
+	padding: 12px 16px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	text-align: center;
+}
+
+.lsm-health-card-ok {
+	border-left: 3px solid #00a32a;
+}
+
+.lsm-health-card-redirect {
+	border-left: 3px solid #dba617;
+}
+
+.lsm-health-card-error {
+	border-left: 3px solid #d63638;
+}
+
+.lsm-health-card-unknown {
+	border-left: 3px solid #a7aaad;
+}
+
+.lsm-health-card-number {
+	display: block;
+	font-size: 24px;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+.lsm-health-card-label {
+	display: block;
+	font-size: 12px;
+	color: #646970;
+	margin-top: 2px;
+}
+
+/* ============================================================
+   Responsive — Tablet (≤ 782px)
+   ============================================================ */
 @media screen and (max-width: 782px) {
+
+	/* --- Tab navigation --- */
+	.lsm-tabs {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.lsm-tabs .nav-tab {
+		padding: 8px 10px;
+		font-size: 13px;
+	}
+
+	/* --- Keywords table --- */
 	.lsm-col-actions {
 		white-space: normal;
 	}
@@ -454,10 +721,25 @@
 		padding: 8px 6px;
 	}
 
-	.lsm-analytics-summary {
-		flex-direction: column;
+	.lsm-col-group,
+	.lsm-keywords-table th:nth-child(4),
+	.lsm-keywords-table td:nth-child(4) {
+		display: none;
 	}
 
+	.lsm-col-links,
+	.lsm-keywords-table th:nth-child(6),
+	.lsm-keywords-table td:nth-child(6) {
+		display: none;
+	}
+
+	.lsm-toggle-btn {
+		min-width: 56px;
+		font-size: 12px;
+		padding: 2px 6px;
+	}
+
+	/* --- Filter bar --- */
 	.lsm-search-form {
 		flex-direction: column;
 		align-items: stretch;
@@ -467,6 +749,78 @@
 		min-width: auto;
 	}
 
+	.lsm-filter-select {
+		min-width: auto;
+		width: 100%;
+	}
+
+	/* --- Bulk actions bar --- */
+	.lsm-bulk-bar {
+		flex-wrap: wrap;
+	}
+
+	.lsm-bulk-select {
+		min-width: auto;
+		flex: 1;
+	}
+
+	/* --- Table footer / pagination --- */
+	.lsm-table-footer {
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.lsm-pagination {
+		justify-content: center;
+	}
+
+	/* --- Analytics --- */
+	.lsm-analytics-summary {
+		flex-direction: column;
+	}
+
+	.lsm-analytics-actions {
+		flex-wrap: wrap;
+	}
+
+	.lsm-analytics-table .lsm-col-group-a,
+	.lsm-analytics-table th:nth-child(4),
+	.lsm-analytics-table td:nth-child(4) {
+		display: none;
+	}
+
+	.lsm-analytics-table .lsm-col-max-a,
+	.lsm-analytics-table th:nth-child(7),
+	.lsm-analytics-table td:nth-child(7) {
+		display: none;
+	}
+
+	/* --- Health summary --- */
+	.lsm-health-summary {
+		flex-direction: column;
+	}
+
+	/* --- Settings / Import-Export form-table --- */
+	.lsm-tab-content .form-table th {
+		display: block;
+		width: 100%;
+		padding-bottom: 4px;
+	}
+
+	.lsm-tab-content .form-table td {
+		display: block;
+		width: 100%;
+		padding-left: 0;
+	}
+
+	/* --- Keywords add-form inline fields --- */
+	.lsm-kw-inline-label {
+		margin-left: 0;
+		display: block;
+		margin-top: 8px;
+	}
+
+	/* --- Preview --- */
 	.lsm-preview-controls {
 		flex-direction: column;
 		align-items: stretch;
@@ -478,16 +832,113 @@
 	}
 }
 
+/* ============================================================
+   Responsive — Mobile (≤ 480px)
+   ============================================================ */
 @media screen and (max-width: 480px) {
+
+	/* --- General --- */
 	.lsm-tab-content {
 		padding: 10px;
 	}
 
+	/* --- Tab navigation --- */
+	.lsm-tabs .nav-tab {
+		flex: 1 1 auto;
+		text-align: center;
+		padding: 8px 6px;
+		font-size: 12px;
+	}
+
+	/* --- Keywords table — horizontal scroll wrapper --- */
+	.lsm-table-scroll {
+		overflow-x: auto;
+		margin: 0 -10px;
+		padding: 0 10px;
+	}
+
 	.lsm-keywords-table {
 		font-size: 13px;
+		min-width: 500px;
+	}
+
+	.lsm-col-check {
+		width: 30px;
+		min-width: 30px;
+	}
+
+	/* --- Bulk actions bar --- */
+	.lsm-bulk-bar {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.lsm-bulk-select {
+		min-width: auto;
+	}
+
+	/* --- Analytics stat cards --- */
+	.lsm-analytics-summary {
+		gap: 10px;
+	}
+
+	.lsm-stat-card {
+		padding: 12px;
 	}
 
 	.lsm-stat-number {
 		font-size: 24px;
+	}
+
+	/* --- Analytics actions --- */
+	.lsm-analytics-actions {
+		flex-direction: column;
+	}
+
+	.lsm-analytics-actions .button {
+		width: 100%;
+		text-align: center;
+	}
+
+	/* --- Analytics table — horizontal scroll --- */
+	.lsm-analytics-table {
+		display: block;
+		overflow-x: auto;
+	}
+
+	/* --- Health summary cards --- */
+	.lsm-health-card {
+		padding: 8px 10px;
+	}
+
+	.lsm-health-card-number {
+		font-size: 20px;
+	}
+
+	/* --- Import / Export --- */
+	.lsm-import-export-section hr {
+		margin: 15px 0;
+	}
+
+	/* --- Preview --- */
+	.lsm-preview-empty {
+		padding: 12px 14px;
+	}
+
+	.lsm-preview-empty-icon {
+		float: none;
+		display: block;
+		margin: 0 0 6px;
+	}
+
+	.lsm-preview-select {
+		min-width: auto;
+		max-width: 100%;
+	}
+
+	/* --- Descriptions overflow --- */
+	.lsm-tab-content .description {
+		word-wrap: break-word;
+		overflow-wrap: break-word;
 	}
 }

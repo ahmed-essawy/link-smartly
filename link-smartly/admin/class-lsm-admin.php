@@ -145,6 +145,16 @@ class Lsm_Admin {
 				'confirmBulkDelete' => esc_html__( 'Are you sure you want to delete the selected keyword mappings?', 'link-smartly' ),
 				'ajaxUrl'           => admin_url( 'admin-ajax.php' ),
 				'nonce'             => wp_create_nonce( 'lsm_ajax' ),
+				'noResults'         => esc_html__( 'No keyword mappings found.', 'link-smartly' ),
+				'textActive'        => esc_html__( 'Active', 'link-smartly' ),
+				'textInactive'      => esc_html__( 'Inactive', 'link-smartly' ),
+				'textEdit'          => esc_html__( 'Edit', 'link-smartly' ),
+				'textDelete'        => esc_html__( 'Delete', 'link-smartly' ),
+				'textSave'          => esc_html__( 'Save', 'link-smartly' ),
+				'textCancel'        => esc_html__( 'Cancel', 'link-smartly' ),
+				'textPage'          => esc_html__( 'Page', 'link-smartly' ),
+				'textItems'         => esc_html__( 'items', 'link-smartly' ),
+				'healthResults'     => $this->get_health_results(),
 			)
 		);
 	}
@@ -862,6 +872,19 @@ class Lsm_Admin {
 	}
 
 	/**
+	 * Get cached URL health results for JS localization.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return array<string, array{status: string, code: int}> Health results keyed by URL.
+	 */
+	private function get_health_results(): array {
+		$health = new Lsm_Health( $this->keywords );
+
+		return $health->get_results();
+	}
+
+	/**
 	 * Render the keywords management tab.
 	 *
 	 * @since 1.0.0
@@ -935,6 +958,7 @@ class Lsm_Admin {
 								   required
 								   placeholder="<?php esc_attr_e( 'e.g., contact us', 'link-smartly' ); ?>"
 								   aria-required="true" />
+							<p class="description"><?php esc_html_e( 'The exact word or phrase to match in your content. Use natural phrases your visitors would read (e.g., "contact us", "pricing plans"). Case does not matter.', 'link-smartly' ); ?></p>
 						</td>
 					</tr>
 					<tr>
@@ -949,7 +973,7 @@ class Lsm_Admin {
 								   required
 								   placeholder="<?php esc_attr_e( 'e.g., /contact/', 'link-smartly' ); ?>"
 								   aria-required="true" />
-							<p class="description"><?php esc_html_e( 'Use relative URLs (e.g., /services/my-page/) or full URLs (e.g., https://example.com/page/).', 'link-smartly' ); ?></p>
+							<p class="description"><?php esc_html_e( 'The page this keyword should link to. Use a relative path for pages on your own site (e.g., /contact/) or a full URL for external sites (e.g., https://example.com/page/). Tip: copy the URL from your browser address bar.', 'link-smartly' ); ?></p>
 						</td>
 					</tr>
 					<tr>
@@ -962,7 +986,7 @@ class Lsm_Admin {
 								   name="lsm_group"
 								   class="regular-text"
 								   placeholder="<?php esc_attr_e( 'e.g., Navigation, Products', 'link-smartly' ); ?>" />
-							<p class="description"><?php esc_html_e( 'Optional. Organize keywords into groups for easier management.', 'link-smartly' ); ?></p>
+							<p class="description"><?php esc_html_e( 'Optional. A label to organize your keywords (e.g., "Navigation", "Products", "Blog"). Leave empty if you don\'t need to group them. Groups only help you filter — they do not appear on your site.', 'link-smartly' ); ?></p>
 						</td>
 					</tr>
 					<tr>
@@ -975,7 +999,7 @@ class Lsm_Admin {
 								   name="lsm_synonyms"
 								   class="regular-text"
 								   placeholder="<?php esc_attr_e( 'e.g., reach out, get in touch', 'link-smartly' ); ?>" />
-							<p class="description"><?php esc_html_e( 'Comma-separated alternative phrases that should also link to the same URL.', 'link-smartly' ); ?></p>
+							<p class="description"><?php esc_html_e( 'Optional. Other phrases that mean the same thing and should link to the same page. Separate with commas (e.g., "reach out, get in touch"). Leave empty if you only need the main keyword.', 'link-smartly' ); ?></p>
 						</td>
 					</tr>
 					<tr>
@@ -991,22 +1015,23 @@ class Lsm_Admin {
 										   min="0"
 										   class="small-text" />
 								</label>
-								<p class="description"><?php esc_html_e( 'Lifetime limit for this keyword (0 = unlimited).', 'link-smartly' ); ?></p>
+								<p class="description"><?php esc_html_e( 'How many times this keyword can be auto-linked across all your posts. Leave at 0 for unlimited (recommended for most users).', 'link-smartly' ); ?></p>
 
 								<br />
 								<label for="lsm-nofollow-kw"><?php esc_html_e( 'Nofollow:', 'link-smartly' ); ?></label>
 								<select id="lsm-nofollow-kw" name="lsm_nofollow_kw">
-									<option value="default"><?php esc_html_e( 'Use global setting', 'link-smartly' ); ?></option>
-									<option value="yes"><?php esc_html_e( 'Yes', 'link-smartly' ); ?></option>
-									<option value="no"><?php esc_html_e( 'No', 'link-smartly' ); ?></option>
+									<option value="default"><?php esc_html_e( 'Use global setting (recommended)', 'link-smartly' ); ?></option>
+									<option value="yes"><?php esc_html_e( 'Yes — tell search engines not to follow', 'link-smartly' ); ?></option>
+									<option value="no"><?php esc_html_e( 'No — let search engines follow', 'link-smartly' ); ?></option>
 								</select>
 
-								<label for="lsm-new-tab-kw" style="margin-left: 15px;"><?php esc_html_e( 'New tab:', 'link-smartly' ); ?></label>
+								<label for="lsm-new-tab-kw" class="lsm-kw-inline-label"><?php esc_html_e( 'New tab:', 'link-smartly' ); ?></label>
 								<select id="lsm-new-tab-kw" name="lsm_new_tab_kw">
-									<option value="default"><?php esc_html_e( 'Use global setting', 'link-smartly' ); ?></option>
-									<option value="yes"><?php esc_html_e( 'Yes', 'link-smartly' ); ?></option>
-									<option value="no"><?php esc_html_e( 'No', 'link-smartly' ); ?></option>
+									<option value="default"><?php esc_html_e( 'Use global setting (recommended)', 'link-smartly' ); ?></option>
+									<option value="yes"><?php esc_html_e( 'Yes — open in new tab', 'link-smartly' ); ?></option>
+									<option value="no"><?php esc_html_e( 'No — open in same tab', 'link-smartly' ); ?></option>
 								</select>
+								<p class="description"><?php esc_html_e( 'Leave both on "Use global setting" unless you need this specific keyword to behave differently from your defaults in the Settings tab.', 'link-smartly' ); ?></p>
 							</fieldset>
 						</td>
 					</tr>
@@ -1015,9 +1040,9 @@ class Lsm_Admin {
 						<td>
 							<label for="lsm-start-date"><?php esc_html_e( 'From:', 'link-smartly' ); ?></label>
 							<input type="date" id="lsm-start-date" name="lsm_start_date" value="" />
-							<label for="lsm-end-date" style="margin-left: 15px;"><?php esc_html_e( 'Until:', 'link-smartly' ); ?></label>
+							<label for="lsm-end-date" class="lsm-kw-inline-label"><?php esc_html_e( 'Until:', 'link-smartly' ); ?></label>
 							<input type="date" id="lsm-end-date" name="lsm_end_date" value="" />
-							<p class="description"><?php esc_html_e( 'Optional. Leave empty for no time restriction.', 'link-smartly' ); ?></p>
+							<p class="description"><?php esc_html_e( 'Optional. Set a date range to auto-link this keyword only during a specific period (e.g., a seasonal promotion). Leave both empty to keep the keyword active indefinitely — this is the best choice for most keywords.', 'link-smartly' ); ?></p>
 						</td>
 					</tr>
 				</table>
@@ -1045,7 +1070,7 @@ class Lsm_Admin {
 						   class="lsm-search-input" />
 
 					<?php if ( ! empty( $groups ) ) : ?>
-						<select name="group" class="lsm-filter-select">
+						<select name="group" class="lsm-filter-select lsm-filter-group">
 							<option value=""><?php esc_html_e( 'All Groups', 'link-smartly' ); ?></option>
 							<?php foreach ( $groups as $group ) : ?>
 								<option value="<?php echo esc_attr( $group ); ?>" <?php selected( $filter_group, $group ); ?>>
@@ -1055,7 +1080,7 @@ class Lsm_Admin {
 						</select>
 					<?php endif; ?>
 
-					<select name="status" class="lsm-filter-select">
+					<select name="status" class="lsm-filter-select lsm-filter-status">
 						<option value=""><?php esc_html_e( 'All Statuses', 'link-smartly' ); ?></option>
 						<option value="active" <?php selected( $filter_status, 'active' ); ?>><?php esc_html_e( 'Active', 'link-smartly' ); ?></option>
 						<option value="inactive" <?php selected( $filter_status, 'inactive' ); ?>><?php esc_html_e( 'Inactive', 'link-smartly' ); ?></option>
@@ -1064,7 +1089,7 @@ class Lsm_Admin {
 					<?php submit_button( esc_html__( 'Filter', 'link-smartly' ), 'secondary', 'submit', false ); ?>
 
 					<?php if ( '' !== $search_term || '' !== $filter_group || '' !== $filter_status ) : ?>
-						<a href="<?php echo esc_url( admin_url( 'options-general.php?page=' . self::PAGE_SLUG . '&tab=keywords' ) ); ?>" class="button"><?php esc_html_e( 'Clear', 'link-smartly' ); ?></a>
+						<a href="<?php echo esc_url( admin_url( 'options-general.php?page=' . self::PAGE_SLUG . '&tab=keywords' ) ); ?>" class="button lsm-clear-filters"><?php esc_html_e( 'Clear', 'link-smartly' ); ?></a>
 					<?php endif; ?>
 				</form>
 			</div>
@@ -1086,19 +1111,20 @@ class Lsm_Admin {
 						<button type="submit" class="button lsm-bulk-apply-btn"><?php esc_html_e( 'Apply', 'link-smartly' ); ?></button>
 					</div>
 
+				<div class="lsm-table-scroll">
 					<table class="widefat striped lsm-keywords-table">
 						<thead>
 							<tr>
 								<th scope="col" class="lsm-col-check"><input type="checkbox" id="lsm-select-all" /></th>
-								<th scope="col"><?php esc_html_e( 'Keyword', 'link-smartly' ); ?></th>
-								<th scope="col"><?php esc_html_e( 'Target URL', 'link-smartly' ); ?></th>
-								<th scope="col"><?php esc_html_e( 'Group', 'link-smartly' ); ?></th>
-								<th scope="col"><?php esc_html_e( 'Status', 'link-smartly' ); ?></th>
-								<th scope="col"><?php esc_html_e( 'Links', 'link-smartly' ); ?></th>
-								<th scope="col"><?php esc_html_e( 'Actions', 'link-smartly' ); ?></th>
+								<th scope="col" class="lsm-col-keyword lsm-sortable" data-orderby="keyword"><?php esc_html_e( 'Keyword', 'link-smartly' ); ?><span class="lsm-sort-arrow"></span></th>
+								<th scope="col" class="lsm-col-url lsm-sortable" data-orderby="url"><?php esc_html_e( 'Target URL', 'link-smartly' ); ?><span class="lsm-sort-arrow"></span></th>
+								<th scope="col" class="lsm-col-group lsm-sortable" data-orderby="group"><?php esc_html_e( 'Group', 'link-smartly' ); ?><span class="lsm-sort-arrow"></span></th>
+								<th scope="col" class="lsm-col-status lsm-sortable" data-orderby="status"><?php esc_html_e( 'Status', 'link-smartly' ); ?><span class="lsm-sort-arrow"></span></th>
+								<th scope="col" class="lsm-col-links lsm-sortable" data-orderby="link_count"><?php esc_html_e( 'Links', 'link-smartly' ); ?><span class="lsm-sort-arrow"></span></th>
+								<th scope="col" class="lsm-col-actions"><?php esc_html_e( 'Actions', 'link-smartly' ); ?></th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody class="lsm-keywords-tbody">
 							<?php foreach ( $filtered as $entry ) : ?>
 								<tr class="lsm-keyword-row" data-id="<?php echo esc_attr( $entry['id'] ); ?>">
 									<td class="lsm-col-check">
@@ -1191,7 +1217,20 @@ class Lsm_Admin {
 							<?php endforeach; ?>
 						</tbody>
 					</table>
+				</div>
 				</form>
+
+				<div class="lsm-table-footer">
+					<div class="lsm-pagination"></div>
+					<div class="lsm-per-page-wrap">
+						<label for="lsm-per-page"><?php esc_html_e( 'Per page:', 'link-smartly' ); ?></label>
+						<select id="lsm-per-page" class="lsm-per-page-select">
+							<option value="25">25</option>
+							<option value="50">50</option>
+							<option value="100">100</option>
+						</select>
+					</div>
+				</div>
 			<?php endif; ?>
 		</div>
 		<?php
@@ -1245,7 +1284,7 @@ class Lsm_Admin {
 						printf(
 							/* translators: %d: number of posts scanned */
 							esc_html__( 'Scan complete. %d posts scanned for keyword matches.', 'link-smartly' ),
-							$scanned
+							intval( $scanned )
 						);
 						?>
 					</p>
@@ -1386,6 +1425,7 @@ class Lsm_Admin {
 								   <?php checked( $settings['enabled'] ); ?> />
 							<?php esc_html_e( 'Automatically insert internal links into content', 'link-smartly' ); ?>
 						</label>
+						<p class="description"><?php esc_html_e( 'Master switch. When checked, the plugin scans your posts and adds links based on your keyword mappings. Uncheck to pause all auto-linking without losing your settings. Default: On.', 'link-smartly' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -1401,7 +1441,7 @@ class Lsm_Admin {
 							   max="50"
 							   step="1"
 							   class="small-text" />
-						<p class="description"><?php esc_html_e( 'Maximum number of auto-links inserted per post. Recommended: 3-5.', 'link-smartly' ); ?></p>
+						<p class="description"><?php esc_html_e( 'How many auto-links can appear in a single post. Too many links look spammy to readers and search engines. Recommended: 3 for short posts, up to 5 for long-form content (2,000+ words). Default: 3.', 'link-smartly' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -1417,7 +1457,7 @@ class Lsm_Admin {
 							   max="5000"
 							   step="1"
 							   class="small-text" />
-						<p class="description"><?php esc_html_e( 'Posts shorter than this word count will not get auto-links. Set to 0 to disable.', 'link-smartly' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Posts shorter than this word count will not get any auto-links. Short posts with too many links look unnatural. Set to 0 to allow links in all posts regardless of length. Default: 300 words.', 'link-smartly' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -1435,6 +1475,7 @@ class Lsm_Admin {
 								</label><br />
 							<?php endforeach; ?>
 						</fieldset>
+						<p class="description"><?php esc_html_e( 'Choose which content types get auto-links. Most sites only need Posts and Pages. Default: Posts and Pages.', 'link-smartly' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -1447,7 +1488,7 @@ class Lsm_Admin {
 							   name="lsm_link_class"
 							   value="<?php echo esc_attr( $settings['link_class'] ); ?>"
 							   class="regular-text" />
-						<p class="description"><?php esc_html_e( 'CSS class added to auto-generated links. Useful for styling or analytics tracking.', 'link-smartly' ); ?></p>
+						<p class="description"><?php esc_html_e( 'A CSS class name added to every auto-generated link. Useful if you want to style them differently or track clicks in analytics. Leave the default unless you know what CSS classes are. Default: lsm-auto-link.', 'link-smartly' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -1461,14 +1502,18 @@ class Lsm_Admin {
 									   value="1"
 									   <?php checked( $settings['add_title_attr'] ); ?> />
 								<?php esc_html_e( 'Add title attribute to links', 'link-smartly' ); ?>
-							</label><br />
+							</label>
+							<p class="description"><?php esc_html_e( 'Shows a tooltip when visitors hover over a link. Helpful for accessibility. Default: On.', 'link-smartly' ); ?></p>
+							<br />
 							<label>
 								<input type="checkbox"
 									   name="lsm_nofollow"
 									   value="1"
 									   <?php checked( $settings['nofollow'] ); ?> />
-								<?php esc_html_e( 'Add rel="nofollow" to links (not recommended for internal links)', 'link-smartly' ); ?>
-							</label><br />
+								<?php esc_html_e( 'Add rel="nofollow" to links', 'link-smartly' ); ?>
+							</label>
+							<p class="description lsm-desc-warning"><?php esc_html_e( 'Tells search engines not to pass SEO value through these links. Do NOT check this for internal links — it blocks link equity flow, which is the whole point of internal linking. Only check this if all your keyword links go to external sites. Default: Off.', 'link-smartly' ); ?></p>
+							<br />
 							<label>
 								<input type="checkbox"
 									   name="lsm_new_tab"
@@ -1476,6 +1521,7 @@ class Lsm_Admin {
 									   <?php checked( $settings['new_tab'] ); ?> />
 								<?php esc_html_e( 'Open links in a new tab', 'link-smartly' ); ?>
 							</label>
+							<p class="description"><?php esc_html_e( 'Internal links usually should NOT open in a new tab — it can annoy readers. Only enable this if your links go to external sites. Default: Off.', 'link-smartly' ); ?></p>
 						</fieldset>
 					</td>
 				</tr>
@@ -1497,7 +1543,7 @@ class Lsm_Admin {
 		?>
 		<div class="lsm-import-export-section">
 			<h2><?php esc_html_e( 'Export Keywords', 'link-smartly' ); ?></h2>
-			<p><?php esc_html_e( 'Download all keyword mappings as a CSV file.', 'link-smartly' ); ?></p>
+			<p><?php esc_html_e( 'Download all your keyword mappings as a CSV file. You can open it in Excel or Google Sheets, or use it as a backup before making bulk changes.', 'link-smartly' ); ?></p>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="lsm_export_csv" />
 				<?php wp_nonce_field( 'lsm_csv_action', 'lsm_nonce' ); ?>
@@ -1507,7 +1553,7 @@ class Lsm_Admin {
 			<hr />
 
 			<h2><?php esc_html_e( 'Import Keywords', 'link-smartly' ); ?></h2>
-			<p><?php esc_html_e( 'Upload a CSV file with keyword mappings. The CSV must have columns: keyword, url, active (1 or 0).', 'link-smartly' ); ?></p>
+			<p><?php esc_html_e( 'Upload a CSV file to add keywords in bulk. Your CSV file must have at least two columns: keyword and url. Additional optional columns: active (1 or 0), group, synonyms, nofollow, new_tab, max_uses, start_date, end_date.', 'link-smartly' ); ?></p>
 			<form method="post"
 				  action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
 				  enctype="multipart/form-data">
@@ -1535,11 +1581,11 @@ class Lsm_Admin {
 								<legend class="screen-reader-text"><span><?php esc_html_e( 'Import Mode', 'link-smartly' ); ?></span></legend>
 								<label>
 									<input type="radio" name="lsm_import_mode" value="append" checked="checked" />
-									<?php esc_html_e( 'Append — add to existing keywords', 'link-smartly' ); ?>
+									<?php esc_html_e( 'Append — add new keywords to your existing list (safe, recommended)', 'link-smartly' ); ?>
 								</label><br />
 								<label>
 									<input type="radio" name="lsm_import_mode" value="replace" />
-									<?php esc_html_e( 'Replace — remove all existing keywords and import fresh', 'link-smartly' ); ?>
+									<?php esc_html_e( 'Replace — delete ALL existing keywords first, then import (use with caution!)', 'link-smartly' ); ?>
 								</label>
 							</fieldset>
 						</td>

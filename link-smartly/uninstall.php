@@ -19,6 +19,7 @@ delete_option( 'lsm_keywords' );
 delete_option( 'lsm_linked_posts' );
 
 delete_transient( 'lsm_active_keywords' );
+delete_transient( 'lsm_url_health' );
 
 // Preview and undo transients are user-scoped; clean up for all users.
 $users = get_users( array( 'fields' => 'ID' ) );

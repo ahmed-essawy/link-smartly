@@ -439,4 +439,125 @@ class Lsm_Cli {
 			)
 		);
 	}
+
+	/**
+	 * Check the health of keyword target URLs.
+	 *
+	 * Performs HTTP HEAD requests to verify URLs are reachable.
+	 * Processes URLs in batches of 50 with rate limiting.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--format=<format>]
+	 * : Output format for results.
+	 * ---
+	 * default: table
+	 * options:
+	 *   - table
+	 *   - csv
+	 *   - json
+	 * ---
+	 *
+	 * [--status=<status>]
+	 * : Only show URLs with this health status.
+	 * ---
+	 * options:
+	 *   - ok
+	 *   - redirect
+	 *   - error
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp link-smartly check-urls
+	 *     wp link-smartly check-urls --status=error
+	 *     wp link-smartly check-urls --format=json
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param array<int, string>    $args       Positional arguments.
+	 * @param array<string, string> $assoc_args Named arguments.
+	 * @return void
+	 */
+	public function check_urls( array $args, array $assoc_args ): void {
+		$health  = new Lsm_Health( $this->keywords );
+		$all     = $this->keywords->get_all();
+		$urls    = array();
+
+		foreach ( $all as $entry ) {
+			$url = $entry['url'] ?? '';
+
+			if ( '' !== $url ) {
+				$urls[ $url ] = true;
+			}
+		}
+
+		$urls  = array_keys( $urls );
+		$total = count( $urls );
+
+		if ( 0 === $total ) {
+			WP_CLI::log( __( 'No keyword URLs to check.', 'link-smartly' ) );
+			return;
+		}
+
+		WP_CLI::log(
+			sprintf(
+				/* translators: %d: total URL count */
+				__( 'Checking %d unique URLs…', 'link-smartly' ),
+				$total
+			)
+		);
+
+		$progress = \WP_CLI\Utils\make_progress_bar( __( 'Checking URLs', 'link-smartly' ), $total );
+		$offset   = 0;
+
+		while ( $offset < $total ) {
+			$result  = $health->check_urls( $offset );
+			$offset += $result['checked'];
+
+			for ( $i = 0; $i < $result['checked']; $i++ ) {
+				$progress->tick();
+			}
+		}
+
+		$progress->finish();
+
+		$results = $health->get_results();
+		$format  = $assoc_args['format'] ?? 'table';
+		$filter  = $assoc_args['status'] ?? '';
+		$rows    = array();
+
+		foreach ( $results as $url => $data ) {
+			if ( '' !== $filter && $data['status'] !== $filter ) {
+				continue;
+			}
+
+			$rows[] = array(
+				'url'        => $url,
+				'status'     => $data['status'],
+				'code'       => $data['code'],
+				'checked_at' => $data['checked_at'],
+			);
+		}
+
+		if ( empty( $rows ) ) {
+			WP_CLI::log( __( 'No results match the specified filter.', 'link-smartly' ) );
+			return;
+		}
+
+		WP_CLI\Utils\format_items( $format, $rows, array( 'url', 'status', 'code', 'checked_at' ) );
+
+		$summary = $health->get_summary();
+
+		WP_CLI::log(
+			sprintf(
+				/* translators: 1: ok count, 2: redirect count, 3: error count, 4: unknown count */
+				__( 'Summary: %1$d OK, %2$d redirects, %3$d errors, %4$d unchecked.', 'link-smartly' ),
+				$summary['ok'],
+				$summary['redirect'],
+				$summary['error'],
+				$summary['unknown']
+			)
+		);
+	}
 }
