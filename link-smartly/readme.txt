@@ -1,8 +1,9 @@
 === Link Smartly ===
 Contributors: ahm.elessawy
+Donate link: https://www.paypal.com/paypalme/ahmessawy/10USD
 Tags: internal links, seo, auto link, keyword linking, interlinking
-Requires at least: 5.8
-Tested up to: 6.9
+Requires at least: 6.3
+Tested up to: 7.0
 Stable tag: 1.4.0
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -47,10 +48,17 @@ Internal links help search engines understand your site structure, distribute pa
 
 == Installation ==
 
-1. Upload the `link-smartly` folder to `/wp-content/plugins/`.
-2. Activate the plugin through the "Plugins" menu in WordPress.
-3. Go to **Settings → Link Smartly** to configure your keyword mappings.
-4. Add keyword-URL pairs and enable auto-linking.
+= Installation from within WordPress =
+
+1. Visit **Plugins → Add New**.
+2. Search for **Link Smartly**.
+3. Install and activate the Link Smartly plugin.
+
+= Manual installation =
+
+1. Upload the entire `link-smartly` folder to the `/wp-content/plugins/` directory.
+2. Visit **Plugins**.
+3. Activate the Link Smartly plugin.
 
 = Quick Start =
 

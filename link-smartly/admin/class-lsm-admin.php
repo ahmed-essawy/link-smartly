@@ -221,8 +221,8 @@ class Lsm_Admin {
 
 		$meta[] = sprintf(
 			'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
-			esc_url( 'https://github.com/ahmed-essawy/link-smartly' ),
-			esc_html__( 'Docs', 'link-smartly' )
+			esc_url( 'https://www.paypal.com/paypalme/ahmessawy/10USD' ),
+			esc_html__( 'Donate', 'link-smartly' )
 		);
 
 		return $meta;
@@ -258,9 +258,10 @@ class Lsm_Admin {
 			'author'          => '<a href="https://minicad.io">Ahmed Essawy</a>',
 			'author_profile'  => 'https://minicad.io',
 			'homepage'        => 'https://github.com/ahmed-essawy/link-smartly',
-			'requires'        => '6.0',
-			'tested'          => '6.9',
-			'requires_php'    => '8.0',
+			'donate_link'     => 'https://www.paypal.com/paypalme/ahmessawy/10USD',
+			'requires'        => '6.3',
+			'tested'          => '7.0',
+			'requires_php'    => '7.4',
 			'downloaded'      => 0,
 			'last_updated'    => gmdate( 'Y-m-d' ),
 			'sections'        => array(
@@ -268,31 +269,94 @@ class Lsm_Admin {
 					. '<h4>' . esc_html__( 'Key Features', 'link-smartly' ) . '</h4>'
 					. '<ul>'
 					. '<li>' . esc_html__( 'Keyword-to-URL mappings with groups, synonyms, and scheduling.', 'link-smartly' ) . '</li>'
-					. '<li>' . esc_html__( 'Smart matching â€” case-insensitive, first-occurrence-only, longest-keyword priority.', 'link-smartly' ) . '</li>'
-					. '<li>' . esc_html__( 'Safe linking â€” never links in headings, existing anchors, code blocks, or to the current page.', 'link-smartly' ) . '</li>'
-					. '<li>' . esc_html__( 'Configurable limits â€” max links per post, minimum content length, per-keyword max uses.', 'link-smartly' ) . '</li>'
+. '<li>' . esc_html__( 'Smart matching — case-insensitive, first-occurrence-only, longest-keyword priority.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Safe linking — never links in headings, existing anchors, code blocks, or to the current page.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Configurable limits — max links per post, minimum content length, per-keyword max uses.', 'link-smartly' ) . '</li>'
 					. '<li>' . esc_html__( 'CSV import/export for bulk keyword management.', 'link-smartly' ) . '</li>'
 					. '<li>' . esc_html__( 'Preview/dry-run to test links before going live.', 'link-smartly' ) . '</li>'
 					. '<li>' . esc_html__( 'Analytics dashboard with per-keyword link counts and URL health checks.', 'link-smartly' ) . '</li>'
 					. '<li>' . esc_html__( 'REST API, WP-CLI, and developer hooks for full extensibility.', 'link-smartly' ) . '</li>'
 					. '</ul>',
-				'installation' => '<ol>'
-					. '<li>' . esc_html__( 'Upload the link-smartly folder to /wp-content/plugins/.', 'link-smartly' ) . '</li>'
-					. '<li>' . esc_html__( 'Activate the plugin through the Plugins menu.', 'link-smartly' ) . '</li>'
-					. '<li>' . esc_html__( 'Go to Settings â†’ Link Smartly to configure keyword mappings.', 'link-smartly' ) . '</li>'
+				'installation' => '<h4>' . esc_html__( 'Installation from within WordPress', 'link-smartly' ) . '</h4>'
+					. '<ol>'
+					. '<li>' . esc_html__( 'Visit Plugins > Add New.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Search for Link Smartly.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Install and activate the Link Smartly plugin.', 'link-smartly' ) . '</li>'
+					. '</ol>'
+					. '<h4>' . esc_html__( 'Manual installation', 'link-smartly' ) . '</h4>'
+					. '<ol>'
+					. '<li>' . esc_html__( 'Upload the entire link-smartly folder to the /wp-content/plugins/ directory.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Visit Plugins.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Activate the Link Smartly plugin.', 'link-smartly' ) . '</li>'
 					. '</ol>',
-				'changelog'    => '<h4>' . esc_html( 'v' . LSM_VERSION ) . '</h4>'
+				'changelog'    => '<h4>v1.3.0</h4>'
 					. '<ul>'
-					. '<li>' . esc_html__( 'AJAX-powered keyword management â€” add, edit, delete, toggle without page reload.', 'link-smartly' ) . '</li>'
-					. '<li>' . esc_html__( 'Server-side pagination, sorting, and search for keyword table.', 'link-smartly' ) . '</li>'
-					. '<li>' . esc_html__( 'URL health checker with batch processing and status badges.', 'link-smartly' ) . '</li>'
-					. '<li>' . esc_html__( 'Improved admin UX with clear field descriptions and safe defaults.', 'link-smartly' ) . '</li>'
-					. '<li>' . esc_html__( 'Fully responsive admin pages across all breakpoints.', 'link-smartly' ) . '</li>'
-					. '</ul>',
+					. '<li>' . esc_html__( 'Added unified cache layer with object cache support and transient fallback.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added keyword suggestion engine that scans existing content for link opportunities.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added orphan content detector to find pages not targeted by any keyword.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added WordPress dashboard widget with quick stats overview.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added link distribution report showing how links are spread across target URLs.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added analytics CSV export with keyword stats, health status, and link counts.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added weekly email digest with top performers, broken URLs, and zero-link keywords.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added WP-Cron automated health checks with configurable schedule.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added content processing cache for faster repeat renders.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added Gutenberg sidebar panel with auto-linking toggle and keyword count.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added REST API endpoints for suggestions and orphan pages.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added WP-CLI commands for keyword suggestions and orphan detection.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Expanded inline edit to support group and active status fields.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added Automation settings section for cron health checks and email digest.', 'link-smartly' ) . '</li>'
+					. '</ul>'
+					. '<details><summary><strong>v1.2.0</strong></summary>'
+					. '<ul>'
+					. '<li>' . esc_html__( 'Added AJAX keyword CRUD without page reloads.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added server-side pagination for keywords table.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added sortable columns with visual sort indicators.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added debounced search and filter for keywords.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added URL health checker with batch HTTP HEAD requests.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added health badges and summary cards.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added REST API health endpoints.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added WP-CLI check-urls command.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added undo on AJAX delete with 5-minute window.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added AJAX bulk actions.', 'link-smartly' ) . '</li>'
+					. '</ul>'
+					. '</details>'
+					. '<details><summary><strong>v1.1.0</strong></summary>'
+					. '<ul>'
+					. '<li>' . esc_html__( 'Added keyword groups for organization.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added synonym/alias support per keyword.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added per-keyword nofollow and new-tab overrides.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added per-keyword lifetime link limit (max uses).', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added scheduled linking with start and end dates.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added link analytics dashboard with per-keyword counts.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added bulk actions (activate, deactivate, delete).', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added search and filter for keywords.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added post-level exclusion meta box.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added external link auto-detection with nofollow and noopener.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added duplicate keyword detection.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added undo for deleted keywords.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added WP-CLI support.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Added REST API endpoints.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Extended CSV import/export with new fields.', 'link-smartly' ) . '</li>'
+					. '</ul>'
+					. '</details>'
+					. '<details><summary><strong>v1.0.0</strong></summary>'
+					. '<ul>'
+					. '<li>' . esc_html__( 'Initial release.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Keyword-to-URL mapping management with add, edit, delete, and toggle.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'DOMDocument-based content processing for safe and reliable linking.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Case-insensitive matching with longest-keyword priority.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Configurable max links per post and minimum content word count.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Post type selection for auto-linking targets.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'CSV import and export for bulk keyword management.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Preview/dry-run feature for testing link insertion.', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Full developer hook support (filters and actions).', 'link-smartly' ) . '</li>'
+					. '<li>' . esc_html__( 'Sample keyword data loaded on activation.', 'link-smartly' ) . '</li>'
+					. '</ul>'
+					. '</details>',
 			),
 			'banners'         => array(
-				'low'  => '',
-				'high' => '',
+				'low'  => 'https://raw.githubusercontent.com/ahmed-essawy/link-smartly/assets/banner-1536x1024.png',
+				'high' => 'https://raw.githubusercontent.com/ahmed-essawy/link-smartly/assets/banner-1536x1024.png',
 			),
 		);
 
