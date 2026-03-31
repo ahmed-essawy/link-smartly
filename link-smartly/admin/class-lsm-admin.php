@@ -355,8 +355,8 @@ class Lsm_Admin {
 					. '</details>',
 			),
 			'banners'         => array(
-				'low'  => 'https://raw.githubusercontent.com/ahmed-essawy/link-smartly/assets/banner-1536x1024.png',
-				'high' => 'https://raw.githubusercontent.com/ahmed-essawy/link-smartly/assets/banner-1536x1024.png',
+				'low'  => 'https://raw.githubusercontent.com/ahmed-essawy/link-smartly/master/assets/banner-1536x1024.png',
+				'high' => 'https://raw.githubusercontent.com/ahmed-essawy/link-smartly/master/assets/banner-1536x1024.png',
 			),
 		);
 
