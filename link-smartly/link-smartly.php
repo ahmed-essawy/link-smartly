@@ -10,9 +10,9 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       link-smartly
  * Domain Path:       /languages
- * Requires at least: 6.0
- * Tested up to:      6.9
- * Requires PHP:      8.0
+ * Requires at least: 5.8
+ * Tested up to:      6.9.4
+ * Requires PHP:      7.4
  *
  * @package LinkSmartly
  */
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  * @var string
  */
-define( 'LSM_VERSION', '1.3.0' );
+define( 'LSM_VERSION', '1.4.0' );
 
 /**
  * Plugin file path constant.
