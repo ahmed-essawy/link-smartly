@@ -44,6 +44,8 @@ class Lsm_Settings {
 			'add_title_attr'     => true,
 			'nofollow'           => false,
 			'new_tab'            => false,
+			'cron_health_check'  => true,
+			'email_digest'       => false,
 		);
 	}
 
@@ -130,6 +132,8 @@ class Lsm_Settings {
 		$clean['add_title_attr']     = ! empty( $input['add_title_attr'] );
 		$clean['nofollow']           = ! empty( $input['nofollow'] );
 		$clean['new_tab']            = ! empty( $input['new_tab'] );
+		$clean['cron_health_check']  = ! empty( $input['cron_health_check'] );
+		$clean['email_digest']       = ! empty( $input['email_digest'] );
 
 		$clean['post_types'] = isset( $input['post_types'] ) && is_array( $input['post_types'] )
 			? array_map( 'sanitize_key', $input['post_types'] )

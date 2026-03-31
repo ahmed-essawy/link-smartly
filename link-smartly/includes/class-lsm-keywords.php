@@ -77,14 +77,14 @@ class Lsm_Keywords {
 	/**
 	 * Get only active keyword mappings, sorted by keyword length (longest first).
 	 *
-	 * Uses a transient cache to avoid repeated option reads on the front-end.
+	 * Uses the plugin cache layer to avoid repeated option reads on the front-end.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return array<int, array<string, mixed>> Active keyword mappings.
 	 */
 	public function get_active(): array {
-		$cached = get_transient( self::TRANSIENT_NAME );
+		$cached = Lsm_Cache::get( 'active_keywords' );
 
 		if ( false !== $cached && is_array( $cached ) ) {
 			return $cached;
@@ -137,7 +137,7 @@ class Lsm_Keywords {
 			$active = array();
 		}
 
-		set_transient( self::TRANSIENT_NAME, $active, self::TRANSIENT_EXPIRY );
+		Lsm_Cache::set( 'active_keywords', $active, self::TRANSIENT_EXPIRY );
 
 		return $active;
 	}
@@ -267,14 +267,14 @@ class Lsm_Keywords {
 	}
 
 	/**
-	 * Flush the active keywords transient cache.
+	 * Flush the active keywords cache.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
 	public function flush_cache(): void {
-		delete_transient( self::TRANSIENT_NAME );
+		Lsm_Cache::delete( 'active_keywords' );
 	}
 
 	/**

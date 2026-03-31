@@ -2,9 +2,9 @@
 
 Auto-internal-linking plugin for WordPress. Define keyword-to-URL mappings — Link Smartly converts the first occurrence of each keyword into an internal link at render time. DOMDocument-based, cache-friendly, SEO-focused.
 
-[![PHP Lint](https://github.com/minicad-io/link-smartly/actions/workflows/php-lint.yml/badge.svg)](https://github.com/minicad-io/link-smartly/actions/workflows/php-lint.yml)
-[![WPCS](https://github.com/minicad-io/link-smartly/actions/workflows/wpcs.yml/badge.svg)](https://github.com/minicad-io/link-smartly/actions/workflows/wpcs.yml)
-[![WP Plugin Check](https://github.com/minicad-io/link-smartly/actions/workflows/wp-plugin-check.yml/badge.svg)](https://github.com/minicad-io/link-smartly/actions/workflows/wp-plugin-check.yml)
+[![PHP Lint](https://github.com/ahmed-essawy/link-smartly/actions/workflows/php-lint.yml/badge.svg)](https://github.com/ahmed-essawy/link-smartly/actions/workflows/php-lint.yml)
+[![WPCS](https://github.com/ahmed-essawy/link-smartly/actions/workflows/wpcs.yml/badge.svg)](https://github.com/ahmed-essawy/link-smartly/actions/workflows/wpcs.yml)
+[![WP Plugin Check](https://github.com/ahmed-essawy/link-smartly/actions/workflows/wp-plugin-check.yml/badge.svg)](https://github.com/ahmed-essawy/link-smartly/actions/workflows/wp-plugin-check.yml)
 
 ## Features
 
@@ -34,7 +34,7 @@ Auto-internal-linking plugin for WordPress. Define keyword-to-URL mappings — L
 
 ### Manual
 
-1. Download the latest release ZIP from [Releases](https://github.com/minicad-io/link-smartly/releases).
+1. Download the latest release ZIP from [Releases](https://github.com/ahmed-essawy/link-smartly/releases).
 2. Upload via **Plugins → Add New → Upload Plugin**.
 3. Activate the plugin.
 

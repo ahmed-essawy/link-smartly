@@ -45,6 +45,79 @@ class Lsm_Meta_Box {
 	public function init(): void {
 		add_action( 'add_meta_boxes', array( $this, 'register' ) );
 		add_action( 'save_post', array( $this, 'save' ), 10, 2 );
+		add_action( 'init', array( $this, 'register_meta' ) );
+		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_assets' ) );
+	}
+
+	/**
+	 * Register post meta for REST API access (block editor).
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return void
+	 */
+	public function register_meta(): void {
+		$settings   = Lsm_Settings::get_all();
+		$post_types = (array) ( $settings['post_types'] ?? array( 'post', 'page' ) );
+
+		foreach ( $post_types as $post_type ) {
+			register_post_meta(
+				$post_type,
+				self::META_KEY,
+				array(
+					'show_in_rest'  => true,
+					'single'        => true,
+					'type'          => 'string',
+					'default'       => '',
+					'auth_callback' => static function () {
+						return current_user_can( 'edit_posts' );
+					},
+				)
+			);
+		}
+	}
+
+	/**
+	 * Enqueue the block editor sidebar panel script.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return void
+	 */
+	public function enqueue_editor_assets(): void {
+		$screen = get_current_screen();
+
+		if ( null === $screen || ! $screen->is_block_editor() ) {
+			return;
+		}
+
+		$settings   = Lsm_Settings::get_all();
+		$post_types = (array) ( $settings['post_types'] ?? array( 'post', 'page' ) );
+
+		if ( ! in_array( $screen->post_type, $post_types, true ) ) {
+			return;
+		}
+
+		$keywords       = new Lsm_Keywords();
+		$active         = $keywords->get_active();
+		$keyword_count  = count( $active );
+
+		wp_enqueue_script(
+			'lsm-editor',
+			LSM_PLUGIN_URL . 'assets/lsm-editor.js',
+			array( 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-i18n' ),
+			LSM_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'lsm-editor',
+			'lsmEditor',
+			array(
+				'metaKey'      => self::META_KEY,
+				'keywordCount' => $keyword_count,
+			)
+		);
 	}
 
 	/**

@@ -1,9 +1,9 @@
 {
-  "name": "minicad-io/link-smartly",
+  "name": "ahmed-essawy/link-smartly",
   "description": "Auto-internal-linking WordPress plugin. Converts keyword occurrences into internal links based on user-defined mappings.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
-  "homepage": "https://github.com/minicad-io/link-smartly",
+  "homepage": "https://github.com/ahmed-essawy/link-smartly",
   "authors": [
     {
       "name": "Ahmed Essawy",

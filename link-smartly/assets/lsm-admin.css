@@ -450,6 +450,40 @@
 	font-size: 14px;
 }
 
+/* Link Distribution table */
+.lsm-distribution-table {
+	margin-top: 10px;
+}
+
+.lsm-dist-bar-container {
+	width: 100%;
+	max-width: 200px;
+	height: 16px;
+	background: #f0f0f1;
+	border-radius: 3px;
+	overflow: hidden;
+}
+
+.lsm-dist-bar {
+	height: 100%;
+	background: #2271b1;
+	border-radius: 3px;
+	min-width: 2px;
+	transition: width 0.2s ease;
+}
+
+.lsm-dist-zero td {
+	color: #d63638;
+}
+
+.lsm-dist-zero .lsm-dist-bar {
+	background: #d63638;
+}
+
+.lsm-dist-heavy .lsm-dist-bar {
+	background: #dba617;
+}
+
 /* Sortable column headers */
 .lsm-sortable {
 	cursor: pointer;

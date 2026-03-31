@@ -560,4 +560,138 @@ class Lsm_Cli {
 			)
 		);
 	}
+
+	/**
+	 * Scan published content and suggest keyword-URL mappings.
+	 *
+	 * Extracts existing <a> tags from published posts and suggests
+	 * keyword-URL pairs not yet mapped.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--format=<format>]
+	 * : Output format.
+	 * ---
+	 * default: table
+	 * options:
+	 *   - table
+	 *   - csv
+	 *   - json
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp lsm suggest
+	 *     wp lsm suggest --format=json
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param array<int, string>    $args       Positional arguments.
+	 * @param array<string, string> $assoc_args Named arguments.
+	 * @return void
+	 */
+	public function suggest( array $args, array $assoc_args ): void {
+		$suggestions_engine = new Lsm_Suggestions( $this->keywords );
+
+		WP_CLI::log( __( 'Scanning published content for link suggestions…', 'link-smartly' ) );
+
+		$offset  = 0;
+		$results = array();
+
+		do {
+			$batch  = $suggestions_engine->scan_existing_links( $offset );
+			$offset += $batch['scanned'];
+
+			if ( 0 === $batch['scanned'] ) {
+				break;
+			}
+		} while ( $offset < $batch['total'] );
+
+		$format      = $assoc_args['format'] ?? 'table';
+		$suggestions = $batch['suggestions'] ?? array();
+
+		if ( empty( $suggestions ) ) {
+			WP_CLI::log( __( 'No new keyword suggestions found.', 'link-smartly' ) );
+			return;
+		}
+
+		$rows = array();
+
+		foreach ( $suggestions as $item ) {
+			$rows[] = array(
+				'keyword'   => $item['keyword'],
+				'url'       => $item['url'],
+				'frequency' => $item['frequency'],
+				'posts'     => count( $item['source_posts'] ),
+			);
+		}
+
+		WP_CLI\Utils\format_items( $format, $rows, array( 'keyword', 'url', 'frequency', 'posts' ) );
+
+		WP_CLI::success(
+			sprintf(
+				/* translators: %d: number of suggestions */
+				__( 'Found %d keyword suggestions.', 'link-smartly' ),
+				count( $suggestions )
+			)
+		);
+	}
+
+	/**
+	 * List published pages not targeted by any keyword mapping.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--format=<format>]
+	 * : Output format.
+	 * ---
+	 * default: table
+	 * options:
+	 *   - table
+	 *   - csv
+	 *   - json
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp lsm orphans
+	 *     wp lsm orphans --format=json
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param array<int, string>    $args       Positional arguments.
+	 * @param array<string, string> $assoc_args Named arguments.
+	 * @return void
+	 */
+	public function orphans( array $args, array $assoc_args ): void {
+		$suggestions_engine = new Lsm_Suggestions( $this->keywords );
+		$orphans            = $suggestions_engine->find_orphan_pages();
+
+		if ( empty( $orphans ) ) {
+			WP_CLI::success( __( 'No orphan pages found — all pages are targeted by keyword mappings.', 'link-smartly' ) );
+			return;
+		}
+
+		$format = $assoc_args['format'] ?? 'table';
+		$rows   = array();
+
+		foreach ( $orphans as $item ) {
+			$rows[] = array(
+				'post_id'   => $item['post_id'],
+				'title'     => $item['title'],
+				'url'       => $item['url'],
+				'post_type' => $item['post_type'],
+			);
+		}
+
+		WP_CLI\Utils\format_items( $format, $rows, array( 'post_id', 'title', 'url', 'post_type' ) );
+
+		WP_CLI::warning(
+			sprintf(
+				/* translators: %d: number of orphan pages */
+				__( '%d orphan pages found with no keyword mappings.', 'link-smartly' ),
+				count( $orphans )
+			)
+		);
+	}
 }

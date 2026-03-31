@@ -165,6 +165,33 @@ class Lsm_Rest {
 				'permission_callback' => array( $this, 'check_permissions' ),
 			)
 		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/suggestions',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_suggestions' ),
+				'permission_callback' => array( $this, 'check_permissions' ),
+				'args'                => array(
+					'offset' => array(
+						'type'              => 'integer',
+						'default'           => 0,
+						'sanitize_callback' => 'absint',
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE,
+			'/orphans',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_orphans' ),
+				'permission_callback' => array( $this, 'check_permissions' ),
+			)
+		);
 	}
 
 	/**
@@ -408,6 +435,35 @@ class Lsm_Rest {
 		$health = new Lsm_Health( $this->keywords );
 
 		return new WP_REST_Response( $health->get_broken_keywords(), 200 );
+	}
+
+	/**
+	 * Get keyword suggestions from existing content links.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param WP_REST_Request $request The request.
+	 * @return WP_REST_Response Response with suggestions.
+	 */
+	public function get_suggestions( WP_REST_Request $request ): WP_REST_Response {
+		$offset      = absint( $request->get_param( 'offset' ) );
+		$suggestions = new Lsm_Suggestions( $this->keywords );
+
+		return new WP_REST_Response( $suggestions->scan_existing_links( $offset ), 200 );
+	}
+
+	/**
+	 * Get orphan pages not targeted by any keyword mapping.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param WP_REST_Request $request The request.
+	 * @return WP_REST_Response Response with orphan pages.
+	 */
+	public function get_orphans( WP_REST_Request $request ): WP_REST_Response {
+		$suggestions = new Lsm_Suggestions( $this->keywords );
+
+		return new WP_REST_Response( $suggestions->find_orphan_pages(), 200 );
 	}
 
 	/**

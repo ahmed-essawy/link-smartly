@@ -10,13 +10,13 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 
 ### Reporting Bugs
 
-- Use the [Bug Report](https://github.com/minicad-io/link-smartly/issues/new?template=bug-report.yml) issue template.
+- Use the [Bug Report](https://github.com/ahmed-essawy/link-smartly/issues/new?template=bug-report.yml) issue template.
 - Search existing issues first to avoid duplicates.
 - Include your WordPress version, PHP version, and plugin version.
 
 ### Suggesting Features
 
-- Use the [Feature Request](https://github.com/minicad-io/link-smartly/issues/new?template=feature-request.yml) issue template.
+- Use the [Feature Request](https://github.com/ahmed-essawy/link-smartly/issues/new?template=feature-request.yml) issue template.
 - Explain the use case, not just the desired solution.
 
 ### Submitting Pull Requests
@@ -30,7 +30,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 
 ```bash
 # Clone the repository
-git clone https://github.com/minicad-io/link-smartly.git
+git clone https://github.com/ahmed-essawy/link-smartly.git
 cd link-smartly
 
 # Lint PHP files
@@ -109,4 +109,4 @@ vendor/bin/phpcs link-smartly/ --standard=WordPress
 
 ## Questions?
 
-Open a [Discussion](https://github.com/minicad-io/link-smartly/discussions) or reach out via the [WordPress.org support forum](https://wordpress.org/support/plugin/link-smartly/).
+Open a [Discussion](https://github.com/ahmed-essawy/link-smartly/discussions) or reach out via the [WordPress.org support forum](https://wordpress.org/support/plugin/link-smartly/).

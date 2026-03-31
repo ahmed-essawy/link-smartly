@@ -66,6 +66,22 @@ class Lsm_Health {
 	const REQUEST_TIMEOUT = 10;
 
 	/**
+	 * Maximum URLs to check per cron batch (lower to avoid timeouts).
+	 *
+	 * @since 1.3.0
+	 * @var int
+	 */
+	const CRON_BATCH_SIZE = 20;
+
+	/**
+	 * WP-Cron event name.
+	 *
+	 * @since 1.3.0
+	 * @var string
+	 */
+	const CRON_HOOK = 'lsm_weekly_health_check';
+
+	/**
 	 * Keywords manager instance.
 	 *
 	 * @since 1.2.0
@@ -121,7 +137,7 @@ class Lsm_Health {
 			}
 		}
 
-		set_transient( self::TRANSIENT_NAME, $results, self::TRANSIENT_EXPIRY );
+		Lsm_Cache::set( 'url_health', $results, self::TRANSIENT_EXPIRY );
 
 		return array(
 			'checked' => $checked,
@@ -138,7 +154,7 @@ class Lsm_Health {
 	 * @return array<string, array{status: string, code: int, checked_at: string}> Results keyed by URL.
 	 */
 	public function get_results(): array {
-		$results = get_transient( self::TRANSIENT_NAME );
+		$results = Lsm_Cache::get( 'url_health' );
 
 		if ( ! is_array( $results ) ) {
 			return array();
@@ -240,7 +256,7 @@ class Lsm_Health {
 	 * @return void
 	 */
 	public function flush(): void {
-		delete_transient( self::TRANSIENT_NAME );
+		Lsm_Cache::delete( 'url_health' );
 	}
 
 	/**
@@ -327,5 +343,66 @@ class Lsm_Health {
 		}
 
 		return home_url( $url );
+	}
+
+	/**
+	 * Run a cron-safe batch health check (lower batch size, no user context).
+	 *
+	 * Processes all URLs in CRON_BATCH_SIZE increments.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return void
+	 */
+	public static function cron_check(): void {
+		$settings = Lsm_Settings::get_all();
+
+		if ( empty( $settings['cron_health_check'] ) ) {
+			return;
+		}
+
+		$keywords = new Lsm_Keywords();
+		$health   = new self( $keywords );
+		$all      = $keywords->get_all();
+		$urls     = $health->extract_unique_urls( $all );
+		$total    = count( $urls );
+		$offset   = 0;
+
+		while ( $offset < $total ) {
+			$result  = $health->check_urls( $offset );
+			$offset += $result['checked'];
+
+			if ( 0 === $result['checked'] ) {
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Schedule the weekly cron health check.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return void
+	 */
+	public static function schedule_cron(): void {
+		if ( ! wp_next_scheduled( self::CRON_HOOK ) ) {
+			wp_schedule_event( time(), 'weekly', self::CRON_HOOK );
+		}
+	}
+
+	/**
+	 * Unschedule the weekly cron health check.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return void
+	 */
+	public static function unschedule_cron(): void {
+		$timestamp = wp_next_scheduled( self::CRON_HOOK );
+
+		if ( false !== $timestamp ) {
+			wp_unschedule_event( $timestamp, self::CRON_HOOK );
+		}
 	}
 }

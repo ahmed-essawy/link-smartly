@@ -1,15 +1,16 @@
 <?php
 /**
- * Admin page template — delegates rendering to Lsm_Admin methods.
+ * Admin page template — delegates rendering to Lsm_Admin_Renderer.
  *
  * This file is required from within Lsm_Admin::render_page(), so $this
  * refers to the Lsm_Admin instance and all local variables ($active_tab,
- * $settings, $keywords, $post_types) are set before inclusion.
+ * $settings, $keywords, $post_types, $renderer) are set before inclusion.
  *
  * @package LinkSmartly
  * @since   1.0.0
  *
  * @var Lsm_Admin                    $this       The admin instance.
+ * @var Lsm_Admin_Renderer           $renderer   The admin renderer instance.
  * @var string                       $active_tab Current active tab.
  * @var array<string, mixed>         $settings   Plugin settings.
  * @var array<int, array>            $keywords   All keyword mappings.
@@ -25,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="wrap lsm-wrap">
 	<h1><?php esc_html_e( 'Link Smartly', 'link-smartly' ); ?></h1>
 
-	<?php $this->render_notices(); ?>
+	<?php $renderer->render_notices(); ?>
 
 	<nav class="nav-tab-wrapper lsm-tabs">
 		<a href="<?php echo esc_url( admin_url( 'options-general.php?page=link-smartly&tab=keywords' ) ); ?>"
@@ -59,23 +60,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php
 		switch ( $active_tab ) {
 			case 'settings':
-				$this->render_settings_tab( $settings, $post_types );
+				$renderer->render_settings_tab( $settings, $post_types );
 				break;
 
 			case 'analytics':
-				$this->render_analytics_tab( $keywords );
+				$renderer->render_analytics_tab( $keywords );
 				break;
 
 			case 'import-export':
-				$this->render_import_export_tab();
+				$renderer->render_import_export_tab();
 				break;
 
 			case 'preview':
-				$this->render_preview_tab();
+				$renderer->render_preview_tab();
 				break;
 
 			default:
-				$this->render_keywords_tab( $keywords );
+				$renderer->render_keywords_tab( $keywords );
 				break;
 		}
 		?>

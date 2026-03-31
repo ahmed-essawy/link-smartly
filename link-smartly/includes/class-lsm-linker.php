@@ -97,6 +97,24 @@ class Lsm_Linker {
 			return $content;
 		}
 
+		// Content processing cache: skip re-processing unchanged content.
+		$post    = get_post();
+		$post_id = ( $post instanceof WP_Post ) ? $post->ID : 0;
+
+		if ( $post_id > 0 ) {
+			$keywords_hash = md5( (string) wp_json_encode( $keyword_map ) );
+			$cache_key     = 'content_' . $post_id;
+			$cache_hash    = md5( $content . $keywords_hash . (string) $post_id );
+			$cached        = Lsm_Cache::get( $cache_key );
+
+			if ( is_array( $cached )
+				&& isset( $cached['hash'], $cached['result'] )
+				&& $cached['hash'] === $cache_hash
+			) {
+				return $cached['result'];
+			}
+		}
+
 		$current_url = $this->get_current_url();
 
 		/**
@@ -137,6 +155,18 @@ class Lsm_Linker {
 		 * @param int    $max_links Maximum links allowed.
 		 */
 		do_action( 'lsm_after_link_insertion', $result, $content, $max_links );
+
+		// Store in content cache.
+		if ( $post_id > 0 && isset( $cache_key, $cache_hash ) ) {
+			Lsm_Cache::set(
+				$cache_key,
+				array(
+					'hash'   => $cache_hash,
+					'result' => $result,
+				),
+				DAY_IN_SECONDS
+			);
+		}
 
 		return $result;
 	}

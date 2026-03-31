@@ -202,6 +202,7 @@ class Lsm_Ajax {
 		$data = array(
 			'keyword'    => $keyword,
 			'url'        => $url,
+			'active'     => isset( $_POST['active'] ) ? ( '1' === sanitize_text_field( wp_unslash( $_POST['active'] ) ) ) : true,
 			'group'      => isset( $_POST['group'] ) ? sanitize_text_field( wp_unslash( $_POST['group'] ) ) : '',
 			'synonyms'   => isset( $_POST['synonyms'] ) ? sanitize_text_field( wp_unslash( $_POST['synonyms'] ) ) : '',
 			'max_uses'   => isset( $_POST['max_uses'] ) ? absint( wp_unslash( $_POST['max_uses'] ) ) : 0,
@@ -254,7 +255,7 @@ class Lsm_Ajax {
 
 		foreach ( $all as $entry ) {
 			if ( $entry['id'] === $id ) {
-				set_transient( 'lsm_undo_' . get_current_user_id(), array( $entry ), 300 );
+				Lsm_Cache::set( 'undo_' . get_current_user_id(), array( $entry ), 300 );
 				break;
 			}
 		}
@@ -354,7 +355,7 @@ class Lsm_Ajax {
 			}
 
 			if ( ! empty( $undo_entries ) ) {
-				set_transient( 'lsm_undo_' . get_current_user_id(), $undo_entries, 300 );
+				Lsm_Cache::set( 'undo_' . get_current_user_id(), $undo_entries, 300 );
 			}
 		}
 

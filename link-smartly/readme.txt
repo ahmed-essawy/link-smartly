@@ -3,7 +3,7 @@ Contributors: ahm.elessawy
 Tags: internal links, seo, auto link, keyword linking, interlinking
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 Requires PHP: 8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -106,6 +106,34 @@ Yes, completely free and open source under GPLv2. No premium tier, no upsells, n
 
 == Changelog ==
 
+= 1.3.0 =
+* Added unified cache layer with object cache support and transient fallback.
+* Added keyword suggestion engine that scans existing content for link opportunities.
+* Added orphan content detector to find pages not targeted by any keyword.
+* Added WordPress dashboard widget with quick stats overview.
+* Added link distribution report showing how links are spread across target URLs.
+* Added analytics CSV export with keyword stats, health status, and link counts.
+* Added weekly email digest with top performers, broken URLs, and zero-link keywords.
+* Added WP-Cron automated health checks with configurable schedule.
+* Added content processing cache for faster repeat renders.
+* Added Gutenberg sidebar panel with auto-linking toggle and keyword count.
+* Added REST API endpoints for suggestions and orphan pages.
+* Added WP-CLI commands for keyword suggestions and orphan detection.
+* Expanded inline edit to support group and active status fields.
+* Added Automation settings section for cron health checks and email digest.
+
+= 1.2.0 =
+* Added AJAX keyword CRUD without page reloads.
+* Added server-side pagination for keywords table.
+* Added sortable columns with visual sort indicators.
+* Added debounced search and filter for keywords.
+* Added URL health checker with batch HTTP HEAD requests.
+* Added health badges and summary cards.
+* Added REST API health endpoints.
+* Added WP-CLI check-urls command.
+* Added undo on AJAX delete with 5-minute window.
+* Added AJAX bulk actions.
+
 = 1.1.0 =
 * Added keyword groups for organization.
 * Added synonym/alias support per keyword.
@@ -136,6 +164,9 @@ Yes, completely free and open source under GPLv2. No premium tier, no upsells, n
 * Sample keyword data loaded on activation.
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+Content intelligence: keyword suggestions, orphan detection, dashboard widget, email digest, Gutenberg sidebar, link distribution report, and unified cache layer.
 
 = 1.1.0 =
 Major feature release: keyword groups, synonyms, analytics, bulk actions, search/filter, post exclusion, WP-CLI, REST API, and more.

@@ -88,7 +88,7 @@ class Lsm_Preview {
 
 		$results['title'] = $post->post_title;
 
-		set_transient( 'lsm_preview_results_' . get_current_user_id(), $results, 60 );
+		Lsm_Cache::set( 'preview_results_' . get_current_user_id(), $results, 60 );
 
 		wp_safe_redirect(
 			add_query_arg(

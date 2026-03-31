@@ -881,6 +881,54 @@
 		if ( editBtn )      { editBtn.style.display      = 'none'; }
 		if ( deleteBtn )    { deleteBtn.style.display     = 'none'; }
 
+		// Show group input in the group column.
+		var groupCol   = row.querySelector( '.lsm-col-group' );
+		var groupBadge = groupCol ? groupCol.querySelector( '.lsm-group-badge, .lsm-no-group' ) : null;
+		var groupValue = '';
+		var groupInput = null;
+
+		if ( groupCol ) {
+			if ( groupBadge ) {
+				groupValue = groupBadge.classList.contains( 'lsm-group-badge' ) ? groupBadge.textContent : '';
+				groupBadge.style.display = 'none';
+			}
+
+			groupInput = document.createElement( 'input' );
+			groupInput.type        = 'text';
+			groupInput.className   = 'lsm-edit-group';
+			groupInput.value       = groupValue;
+			groupInput.placeholder = lsmAdmin.textGroup || 'Group';
+			groupInput.style.width = '100%';
+			groupCol.appendChild( groupInput );
+		}
+
+		// Show active toggle in the status column.
+		var statusCol = row.querySelector( '.lsm-col-status' );
+		var toggleBtn = statusCol ? statusCol.querySelector( '.lsm-toggle-btn' ) : null;
+		var isActive  = toggleBtn ? ( '1' === toggleBtn.getAttribute( 'data-active' ) ) : true;
+		var activeSelect = null;
+
+		if ( statusCol && toggleBtn ) {
+			toggleBtn.style.display = 'none';
+
+			activeSelect = document.createElement( 'select' );
+			activeSelect.className = 'lsm-edit-active';
+
+			var optActive   = document.createElement( 'option' );
+			optActive.value = '1';
+			optActive.textContent = lsmAdmin.textActive || 'Active';
+
+			var optInactive   = document.createElement( 'option' );
+			optInactive.value = '0';
+			optInactive.textContent = lsmAdmin.textInactive || 'Inactive';
+
+			activeSelect.appendChild( optActive );
+			activeSelect.appendChild( optInactive );
+			activeSelect.value = isActive ? '1' : '0';
+
+			statusCol.appendChild( activeSelect );
+		}
+
 		// Create save/cancel buttons.
 		var actions = row.querySelector( '.lsm-col-actions' );
 
@@ -898,11 +946,15 @@
 
 			saveBtn.addEventListener( 'click', function() {
 				var id = row.getAttribute( 'data-id' );
+				var editGroupInput  = row.querySelector( '.lsm-edit-group' );
+				var editActiveInput = row.querySelector( '.lsm-edit-active' );
 
 				ajaxPost( 'lsm_edit_keyword', {
 					id:      id,
 					keyword: keywordInput.value,
-					url:     urlInput.value
+					url:     urlInput.value,
+					group:   editGroupInput  ? editGroupInput.value  : '',
+					active:  editActiveInput ? editActiveInput.value : '1'
 				}, function( success, data ) {
 					if ( success ) {
 						showNotice( data.message || 'Updated.', 'success' );

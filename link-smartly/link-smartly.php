@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name:       Link Smartly
- * Plugin URI:        https://minicad.io/link-smartly/
+ * Plugin URI:        https://github.com/ahmed-essawy/link-smartly
  * Description:       Automatically insert internal links into your content based on keyword-to-URL mappings. Lightweight, cache-friendly, and SEO-focused.
- * Version:           1.2.0
+ * Version:           1.3.0
  * Author:            Ahmed Essawy
  * Author URI:        https://minicad.io
  * License:           GPL-2.0-or-later
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  * @var string
  */
-define( 'LSM_VERSION', '1.2.0' );
+define( 'LSM_VERSION', '1.3.0' );
 
 /**
  * Plugin file path constant.
@@ -64,6 +64,7 @@ define( 'LSM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'LSM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 require_once LSM_PLUGIN_DIR . 'includes/class-lsm-activator.php';
+require_once LSM_PLUGIN_DIR . 'includes/class-lsm-cache.php';
 require_once LSM_PLUGIN_DIR . 'includes/class-lsm-keywords.php';
 require_once LSM_PLUGIN_DIR . 'includes/class-lsm-settings.php';
 require_once LSM_PLUGIN_DIR . 'includes/class-lsm-linker.php';
@@ -71,12 +72,37 @@ require_once LSM_PLUGIN_DIR . 'includes/class-lsm-meta-box.php';
 require_once LSM_PLUGIN_DIR . 'includes/class-lsm-cli.php';
 require_once LSM_PLUGIN_DIR . 'includes/class-lsm-rest.php';
 require_once LSM_PLUGIN_DIR . 'includes/class-lsm-health.php';
+require_once LSM_PLUGIN_DIR . 'includes/class-lsm-suggestions.php';
+require_once LSM_PLUGIN_DIR . 'includes/class-lsm-notifications.php';
+require_once LSM_PLUGIN_DIR . 'admin/class-lsm-admin-handlers.php';
+require_once LSM_PLUGIN_DIR . 'admin/class-lsm-admin-renderer.php';
 require_once LSM_PLUGIN_DIR . 'admin/class-lsm-admin.php';
 require_once LSM_PLUGIN_DIR . 'admin/class-lsm-csv.php';
 require_once LSM_PLUGIN_DIR . 'admin/class-lsm-preview.php';
 require_once LSM_PLUGIN_DIR . 'admin/class-lsm-ajax.php';
+require_once LSM_PLUGIN_DIR . 'admin/class-lsm-dashboard.php';
 
 register_activation_hook( __FILE__, array( 'Lsm_Activator', 'activate' ) );
+register_activation_hook( __FILE__, array( 'Lsm_Health', 'schedule_cron' ) );
+register_activation_hook( __FILE__, array( 'Lsm_Notifications', 'schedule_cron' ) );
+register_deactivation_hook( __FILE__, array( 'Lsm_Health', 'unschedule_cron' ) );
+register_deactivation_hook( __FILE__, array( 'Lsm_Notifications', 'unschedule_cron' ) );
+
+add_action( Lsm_Health::CRON_HOOK, array( 'Lsm_Health', 'cron_check' ) );
+add_action( Lsm_Notifications::CRON_HOOK, array( 'Lsm_Notifications', 'send_digest' ) );
+
+/**
+ * Flush the content processing cache when keywords or settings change.
+ *
+ * @since 1.3.0
+ *
+ * @return void
+ */
+function lsm_flush_content_cache(): void {
+	Lsm_Cache::flush();
+}
+add_action( 'lsm_keywords_saved', 'lsm_flush_content_cache' );
+add_action( 'lsm_settings_saved', 'lsm_flush_content_cache' );
 
 /**
  * Initialize the plugin.
@@ -143,6 +169,9 @@ function lsm_boot_admin(): void {
 
 	$preview = new Lsm_Preview( new Lsm_Keywords() );
 	$preview->init();
+
+	$dashboard = new Lsm_Dashboard( new Lsm_Keywords() );
+	$dashboard->init();
 }
 add_action( 'plugins_loaded', 'lsm_boot_admin' );
 

@@ -56,6 +56,7 @@ class Lsm_Csv {
 	public function init(): void {
 		add_action( 'admin_post_lsm_export_csv', array( $this, 'handle_export' ) );
 		add_action( 'admin_post_lsm_import_csv', array( $this, 'handle_import' ) );
+		add_action( 'admin_post_lsm_export_analytics', array( $this, 'handle_export_analytics' ) );
 	}
 
 	/**
@@ -288,6 +289,69 @@ class Lsm_Csv {
 				admin_url( 'options-general.php' )
 			)
 		);
+		exit;
+	}
+
+	/**
+	 * Handle analytics CSV export.
+	 *
+	 * Exports keyword statistics including link counts, posts linked, and health status.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return void
+	 */
+	public function handle_export_analytics(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Unauthorized access.', 'link-smartly' ), 403 );
+		}
+
+		check_admin_referer( self::NONCE_ACTION, 'lsm_nonce' );
+
+		$keywords     = $this->keywords->get_all();
+		$linked_posts = $this->keywords->get_all_linked_posts();
+		$health       = new Lsm_Health( $this->keywords );
+		$health_data  = $health->get_results();
+		$filename     = 'link-smartly-analytics-' . gmdate( 'Y-m-d' ) . '.csv';
+
+		header( 'Content-Type: text/csv; charset=UTF-8' );
+		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+		header( 'Pragma: no-cache' );
+		header( 'Expires: 0' );
+
+		$output = fopen( 'php://output', 'w' );
+
+		if ( false === $output ) {
+			wp_die( esc_html__( 'Failed to create export file.', 'link-smartly' ) );
+		}
+
+		fputcsv( $output, array( 'keyword', 'url', 'group', 'status', 'link_count', 'posts_linked', 'max_uses', 'health_status', 'health_code', 'last_checked' ) );
+
+		foreach ( $keywords as $entry ) {
+			$url          = $entry['url'] ?? '';
+			$posts_linked = isset( $linked_posts[ $entry['id'] ] ) ? count( $linked_posts[ $entry['id'] ] ) : 0;
+			$h_status     = isset( $health_data[ $url ] ) ? $health_data[ $url ]['status'] : 'unknown';
+			$h_code       = isset( $health_data[ $url ] ) ? $health_data[ $url ]['code'] : 0;
+			$h_checked    = isset( $health_data[ $url ] ) ? $health_data[ $url ]['checked_at'] : '';
+
+			fputcsv(
+				$output,
+				array(
+					$entry['keyword'],
+					$url,
+					$entry['group'] ?? '',
+					! empty( $entry['active'] ) ? 'active' : 'inactive',
+					(string) ( $entry['link_count'] ?? 0 ),
+					(string) $posts_linked,
+					(string) ( $entry['max_uses'] ?? 0 ),
+					$h_status,
+					(string) $h_code,
+					$h_checked,
+				)
+			);
+		}
+
+		fclose( $output ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		exit;
 	}
 }

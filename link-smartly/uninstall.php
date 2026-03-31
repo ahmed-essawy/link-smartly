@@ -18,10 +18,21 @@ delete_option( 'lsm_settings' );
 delete_option( 'lsm_keywords' );
 delete_option( 'lsm_linked_posts' );
 
+// Unschedule cron events.
+$cron_hooks = array( 'lsm_weekly_health_check', 'lsm_email_digest' );
+foreach ( $cron_hooks as $hook ) {
+	$timestamp = wp_next_scheduled( $hook );
+	if ( false !== $timestamp ) {
+		wp_unschedule_event( $timestamp, $hook );
+	}
+}
+
+// Clean up all transients (known keys + user-scoped).
 delete_transient( 'lsm_active_keywords' );
 delete_transient( 'lsm_url_health' );
+delete_transient( 'lsm_content_cache_hash' );
 
-// Preview and undo transients are user-scoped; clean up for all users.
+// Preview, undo, and content cache transients are user/post-scoped; clean up for all users.
 $users = get_users( array( 'fields' => 'ID' ) );
 foreach ( $users as $user_id ) {
 	delete_transient( 'lsm_preview_results_' . $user_id );

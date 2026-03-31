@@ -4,6 +4,31 @@ All notable changes to Link Smartly will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-07-14
+
+### Added
+
+- **Unified cache layer** (`Lsm_Cache`): Transparent caching with `wp_cache_*` (object cache) when available, transient fallback otherwise. All plugin components migrated to use this layer.
+- **Keyword suggestion engine** (`Lsm_Suggestions`): Scans published content with DOMDocument to discover internal link opportunities. Returns suggestions sorted by frequency, deduplicated against existing keyword mappings.
+- **Orphan content detector**: Identifies published pages/posts not targeted by any keyword mapping. Available via REST API and WP-CLI.
+- **Dashboard widget** (`Lsm_Dashboard`): WordPress admin dashboard widget showing Total Keywords, Active Keywords, Links Inserted, and Broken URLs at a glance.
+- **Link distribution report**: Visual bar chart in Analytics tab showing how links are distributed across target URLs. Highlights pages receiving zero links or disproportionately many.
+- **Analytics CSV export**: Full keyword report download with stats (link count, posts linked, max uses) and URL health status (status, HTTP code, last checked).
+- **Email digest** (`Lsm_Notifications`): Weekly HTML email to site admin with top 5 performers, broken URLs, zero-link keywords, and summary stats. Controlled via Settings → Automation.
+- **WP-Cron health checks** (`Lsm_Health`): Automated weekly URL health scanning with configurable toggle in Settings → Automation.
+- **Content processing cache**: Hash-based caching in `Lsm_Linker::process_content()` to skip DOMDocument processing on unchanged content. Invalidated automatically on keyword or settings changes.
+- **Gutenberg sidebar panel**: Block editor `PluginDocumentSettingPanel` with auto-linking toggle and active keyword count. Classic meta box preserved as fallback.
+- **REST API endpoints**: `GET /suggestions` (with offset pagination) and `GET /orphans` for programmatic access to content intelligence features.
+- **WP-CLI commands**: `wp lsm suggest` (batch content scan with table/csv/json output) and `wp lsm orphans` (orphan page listing).
+- **Expanded inline edit**: Quick-edit now supports group and active status fields alongside keyword and URL.
+- **Automation settings section**: New Settings tab section with toggles for automated health checks and email digest.
+
+### Changed
+
+- All transient calls throughout the plugin replaced with `Lsm_Cache` for consistent caching behavior.
+- Post meta (`_lsm_exclude`) registered via `register_post_meta()` for REST API compatibility with the block editor.
+- `wp_localize_script` expanded with `textGroup` string for inline edit UI.
+
 ## [1.2.0] - 2025-07-13
 
 ### Added
@@ -85,6 +110,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Uninstall cleanup removes all plugin data.
 - Vanilla JS admin interface — no jQuery dependency.
 
-[1.2.0]: https://github.com/minicad-io/link-smartly/compare/v1.1.0...v1.2.0
-[1.1.0]: https://github.com/minicad-io/link-smartly/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/minicad-io/link-smartly/releases/tag/v1.0.0
+[1.2.0]: https://github.com/ahmed-essawy/link-smartly/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/ahmed-essawy/link-smartly/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/ahmed-essawy/link-smartly/releases/tag/v1.0.0
