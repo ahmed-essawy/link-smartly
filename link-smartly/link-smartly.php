@@ -3,7 +3,7 @@
  * Plugin Name:       Link Smartly
  * Plugin URI:        https://github.com/ahmed-essawy/link-smartly
  * Description:       Automatically insert internal links into your content based on keyword-to-URL mappings. Lightweight, cache-friendly, and SEO-focused.
- * Version:           1.3.0
+ * Version:           1.4.0
  * Author:            Ahmed Essawy
  * Author URI:        https://minicad.io
  * License:           GPL-2.0-or-later
@@ -11,7 +11,7 @@
  * Text Domain:       link-smartly
  * Domain Path:       /languages
  * Requires at least: 5.8
- * Tested up to:      6.9.4
+ * Tested up to:      6.9
  * Requires PHP:      7.4
  *
  * @package LinkSmartly
