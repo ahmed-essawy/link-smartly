@@ -1,12 +1,11 @@
 <?php
+declare( strict_types = 1 );
 /**
  * Admin page orchestrator — menu, assets, and plugin metadata.
  *
  * @package LinkSmartly
  * @since   1.0.0
  */
-
-declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
