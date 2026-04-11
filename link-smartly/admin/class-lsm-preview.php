@@ -79,12 +79,22 @@ class Lsm_Preview {
 			return;
 		}
 
-		$content  = apply_filters( 'the_content', $post->post_content );
-		$url      = (string) get_permalink( $post );
-		$settings = Lsm_Settings::get_all();
+		$results = array(
+			'content'  => $post->post_content,
+			'links'    => array(),
+			'excluded' => false,
+		);
 
-		$linker  = new Lsm_Linker( $this->keywords, $settings );
-		$results = $linker->preview( $content, $url );
+		if ( ! Lsm_Meta_Box::is_excluded( $post->ID ) ) {
+			$content  = apply_filters( 'the_content', $post->post_content );
+			$url      = (string) get_permalink( $post );
+			$settings = Lsm_Settings::get_all();
+
+			$linker  = new Lsm_Linker( $this->keywords, $settings );
+			$results = $linker->preview( $content, $url );
+		} else {
+			$results['excluded'] = true;
+		}
 
 		$results['title'] = $post->post_title;
 

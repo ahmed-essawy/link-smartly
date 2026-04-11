@@ -31,6 +31,14 @@ class Lsm_Cache {
 	const GROUP = 'lsm';
 
 	/**
+	 * Option name for cache namespace versions.
+	 *
+	 * @since 1.3.0
+	 * @var string
+	 */
+	const VERSION_OPTION = 'lsm_cache_versions';
+
+	/**
 	 * Whether a persistent external object cache is active.
 	 *
 	 * @since 1.3.0
@@ -72,6 +80,67 @@ class Lsm_Cache {
 		}
 
 		return $prefixed;
+	}
+
+	/**
+	 * Get a cache key that is namespaced by a persistent version value.
+	 *
+	 * Used for cache families that cannot be enumerated efficiently, such as
+	 * per-post content caches stored in transients.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param string $namespace Cache namespace.
+	 * @param string $key       Cache key within the namespace.
+	 * @return string Versioned cache key.
+	 */
+	public static function get_versioned_key( string $namespace, string $key ): string {
+		$namespace = sanitize_key( $namespace );
+		$versions  = self::get_cache_versions();
+
+		if ( ! isset( $versions[ $namespace ] ) ) {
+			$versions[ $namespace ] = wp_rand( 100000, 999999 );
+			update_option( self::VERSION_OPTION, $versions );
+		}
+
+		return $namespace . '_' . absint( $versions[ $namespace ] ) . '_' . $key;
+	}
+
+	/**
+	 * Bump the persistent version number for a cache namespace.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param string $namespace Cache namespace.
+	 * @return void
+	 */
+	public static function bump_version( string $namespace ): void {
+		$namespace = sanitize_key( $namespace );
+		$versions  = self::get_cache_versions();
+
+		if ( ! isset( $versions[ $namespace ] ) ) {
+			$versions[ $namespace ] = wp_rand( 100000, 999999 );
+		}
+
+		++$versions[ $namespace ];
+		update_option( self::VERSION_OPTION, $versions );
+	}
+
+	/**
+	 * Get cache namespace versions.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return array<string, int> Cache versions keyed by namespace.
+	 */
+	private static function get_cache_versions(): array {
+		$versions = get_option( self::VERSION_OPTION, array() );
+
+		if ( ! is_array( $versions ) ) {
+			$versions = array();
+		}
+
+		return $versions;
 	}
 
 	/**
@@ -138,26 +207,20 @@ class Lsm_Cache {
 	 * @return void
 	 */
 	public static function flush(): void {
-		if ( self::has_object_cache() ) {
+		self::delete( 'active_keywords' );
+		self::delete( 'url_health' );
+		self::delete( 'suggestions' );
+		self::bump_version( 'content' );
+
+		if ( self::has_object_cache() && function_exists( 'wp_cache_flush_group' ) ) {
 			wp_cache_flush_group( self::GROUP );
-			return;
-		}
-
-		// Transient fallback: delete all known keys.
-		$known_keys = array(
-			'active_keywords',
-			'url_health',
-		);
-
-		foreach ( $known_keys as $key ) {
-			delete_transient( self::transient_key( $key ) );
 		}
 
 		// User-scoped transients.
 		$users = get_users( array( 'fields' => 'ID' ) );
 		foreach ( $users as $user_id ) {
-			delete_transient( 'lsm_preview_results_' . $user_id );
-			delete_transient( 'lsm_undo_' . $user_id );
+			self::delete( 'preview_results_' . $user_id );
+			self::delete( 'undo_' . $user_id );
 		}
 	}
 

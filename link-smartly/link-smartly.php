@@ -12,7 +12,7 @@
  * Domain Path:       /languages
  * Requires at least: 6.3
  * Tested up to:      7.0
- * Requires PHP:      7.4
+ * Requires PHP:      8.0
  *
  * @package LinkSmartly
  */
@@ -117,6 +117,29 @@ function lsm_init(): void {
 add_action( 'init', 'lsm_init' );
 
 /**
+ * Check whether highlight verification mode is active.
+ *
+ * Highlight mode is available only on the front end for administrators.
+ *
+ * @since 1.4.0
+ *
+ * @return bool True when highlight mode is active.
+ */
+function lsm_is_highlight_mode(): bool {
+	if ( is_admin() || ! current_user_can( 'manage_options' ) ) {
+		return false;
+	}
+
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended
+	$highlight = isset( $_GET['lsm_highlight'] )
+		? absint( wp_unslash( $_GET['lsm_highlight'] ) )
+		: 0;
+	// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+	return 1 === $highlight;
+}
+
+/**
  * Boot the front-end linker on template_redirect.
  *
  * @since 1.0.0
@@ -146,8 +169,36 @@ function lsm_boot_linker(): void {
 	$priority = (int) apply_filters( 'lsm_content_filter_priority', 999 );
 
 	add_filter( 'the_content', array( $linker, 'process_content' ), $priority );
+
+	// Enqueue highlight styles when ?lsm_highlight=1 is present.
+	if ( lsm_is_highlight_mode() ) {
+		add_action( 'wp_head', 'lsm_print_highlight_styles' );
+	}
 }
 add_action( 'template_redirect', 'lsm_boot_linker' );
+
+/**
+ * Print inline CSS for the highlight verification mode.
+ *
+ * Only loaded when an admin visits a page with ?lsm_highlight=1.
+ *
+ * @since 1.4.0
+ *
+ * @return void
+ */
+function lsm_print_highlight_styles(): void {
+	echo '<style id="lsm-highlight-css">'
+		. '.lsm-highlight{'
+		. 'outline:2px solid #d63638;'
+		. 'outline-offset:2px;'
+		. 'background:rgba(214,54,56,0.08);'
+		. 'border-radius:2px;'
+		. '}'
+		. '.lsm-highlight:hover{'
+		. 'background:rgba(214,54,56,0.15);'
+		. '}'
+		. '</style>' . "\n";
+}
 
 /**
  * Boot the admin interface.

@@ -92,6 +92,7 @@ class Lsm_Linker {
 		}
 
 		$keyword_map = $this->keywords->get_active();
+		$highlight_mode = $this->is_highlight_mode();
 
 		if ( empty( $keyword_map ) ) {
 			return $content;
@@ -101,10 +102,11 @@ class Lsm_Linker {
 		$post    = get_post();
 		$post_id = ( $post instanceof WP_Post ) ? $post->ID : 0;
 
-		if ( $post_id > 0 ) {
+		if ( ! $highlight_mode && $post_id > 0 ) {
 			$keywords_hash = md5( (string) wp_json_encode( $keyword_map ) );
-			$cache_key     = 'content_' . $post_id;
-			$cache_hash    = md5( $content . $keywords_hash . (string) $post_id );
+			$settings_hash = $this->get_cache_settings_hash();
+			$cache_key     = Lsm_Cache::get_versioned_key( 'content', 'content_' . $post_id );
+			$cache_hash    = md5( $content . $keywords_hash . $settings_hash . (string) $post_id );
 			$cached        = Lsm_Cache::get( $cache_key );
 
 			if ( is_array( $cached )
@@ -143,7 +145,7 @@ class Lsm_Linker {
 		 */
 		$max_links = (int) apply_filters( 'lsm_max_links_per_post', $max_links, $content );
 
-		$result = $this->insert_links( $content, $keyword_map, $current_url, $max_links );
+		$result = $this->insert_links( $content, $keyword_map, $current_url, $max_links, $highlight_mode );
 
 		/**
 		 * Fires after auto-links have been inserted into content.
@@ -157,7 +159,7 @@ class Lsm_Linker {
 		do_action( 'lsm_after_link_insertion', $result, $content, $max_links );
 
 		// Store in content cache.
-		if ( $post_id > 0 && isset( $cache_key, $cache_hash ) ) {
+		if ( ! $highlight_mode && $post_id > 0 && isset( $cache_key, $cache_hash ) ) {
 			Lsm_Cache::set(
 				$cache_key,
 				array(
@@ -438,6 +440,11 @@ class Lsm_Linker {
 
 		$css_class = $this->settings['link_class'] ?? 'lsm-auto-link';
 
+		// Add highlight class when ?lsm_highlight=1 is present for visual verification.
+		if ( $this->is_highlight_mode() ) {
+			$css_class .= ' lsm-highlight';
+		}
+
 		if ( '' !== $css_class ) {
 			$link->setAttribute( 'class', $css_class );
 		}
@@ -571,6 +578,42 @@ class Lsm_Linker {
 		}
 
 		return (string) get_permalink( $post );
+	}
+
+	/**
+	 * Check whether the current request is in highlight verification mode.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @return bool True when highlight mode is active.
+	 */
+	private function is_highlight_mode(): bool {
+		if ( ! function_exists( 'lsm_is_highlight_mode' ) ) {
+			return false;
+		}
+
+		return lsm_is_highlight_mode();
+	}
+
+	/**
+	 * Build a hash of settings that affect rendered link markup.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return string Cache settings hash.
+	 */
+	private function get_cache_settings_hash(): string {
+		$cache_settings = array(
+			'max_links_per_post' => (int) ( $this->settings['max_links_per_post'] ?? 3 ),
+			'min_content_words'  => (int) ( $this->settings['min_content_words'] ?? 300 ),
+			'link_class'         => (string) ( $this->settings['link_class'] ?? 'lsm-auto-link' ),
+			'add_title_attr'     => ! empty( $this->settings['add_title_attr'] ),
+			'nofollow'           => ! empty( $this->settings['nofollow'] ),
+			'new_tab'            => ! empty( $this->settings['new_tab'] ),
+			'post_types'         => array_values( (array) ( $this->settings['post_types'] ?? array() ) ),
+		);
+
+		return md5( (string) wp_json_encode( $cache_settings ) );
 	}
 
 	/**

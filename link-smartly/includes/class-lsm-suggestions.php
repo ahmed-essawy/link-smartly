@@ -90,14 +90,20 @@ class Lsm_Suggestions {
 
 		$query   = new WP_Query( $query_args );
 		$total   = (int) $query->found_posts;
-		$scanned = 0;
+		$scanned = count( $query->posts );
 
 		// Get existing keyword-URL pairs for deduplication.
 		$existing_map = $this->build_existing_map();
 
-		// Accumulate raw link data from cached results (if continuing batch).
-		$cached = Lsm_Cache::get( self::CACHE_KEY );
-		$links  = ( false !== $cached && is_array( $cached ) ) ? $cached : array();
+		// Accumulate raw link data from cached results only when continuing a batch.
+		$links = array();
+
+		if ( 0 === $batch_offset ) {
+			Lsm_Cache::delete( self::CACHE_KEY );
+		} else {
+			$cached = Lsm_Cache::get( self::CACHE_KEY );
+			$links  = ( false !== $cached && is_array( $cached ) ) ? $cached : array();
+		}
 
 		if ( $query->have_posts() ) {
 			foreach ( $query->posts as $post_id ) {
@@ -129,7 +135,6 @@ class Lsm_Suggestions {
 					}
 				}
 
-				++$scanned;
 			}
 		}
 
@@ -183,6 +188,7 @@ class Lsm_Suggestions {
 	public function find_orphan_pages(): array {
 		$settings   = Lsm_Settings::get_all();
 		$post_types = $settings['post_types'] ?? array( 'post', 'page' );
+		$batch_size = 200;
 
 		$all_keywords = $this->keywords->get_all();
 
@@ -199,18 +205,25 @@ class Lsm_Suggestions {
 			$mapped_urls[ $this->normalize_url( $url ) ] = true;
 		}
 
-		$query_args = array(
-			'post_type'      => $post_types,
-			'post_status'    => 'publish',
-			'posts_per_page' => 500,
-			'fields'         => 'ids',
-			'no_found_rows'  => true,
-		);
-
-		$query   = new WP_Query( $query_args );
 		$orphans = array();
+		$page    = 1;
 
-		if ( $query->have_posts() ) {
+		do {
+			$query = new WP_Query(
+				array(
+					'post_type'              => $post_types,
+					'post_status'            => 'publish',
+					'posts_per_page'         => $batch_size,
+					'paged'                  => $page,
+					'fields'                 => 'ids',
+					'orderby'                => 'ID',
+					'order'                  => 'ASC',
+					'no_found_rows'          => true,
+					'update_post_meta_cache' => false,
+					'update_post_term_cache' => false,
+				)
+			);
+
 			foreach ( $query->posts as $post_id ) {
 				$post_id   = (int) $post_id;
 				$permalink = (string) get_permalink( $post_id );
@@ -229,7 +242,9 @@ class Lsm_Suggestions {
 					}
 				}
 			}
-		}
+
+			++$page;
+		} while ( count( $query->posts ) === $batch_size );
 
 		wp_reset_postdata();
 

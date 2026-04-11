@@ -467,6 +467,7 @@ class Lsm_Admin_Handlers {
 
 		$linker      = new Lsm_Linker( $this->keywords, $settings );
 		$keyword_map = $this->keywords->get_active();
+		$batch_size  = 200;
 
 		if ( empty( $keyword_map ) || empty( $allowed_types ) ) {
 			wp_safe_redirect(
@@ -482,57 +483,69 @@ class Lsm_Admin_Handlers {
 			exit;
 		}
 
-		$posts = get_posts(
-			array(
-				'post_type'      => $allowed_types,
-				'post_status'    => 'publish',
-				'posts_per_page' => 500,
-				'fields'         => 'ids',
-				'no_found_rows'  => true,
-			)
-		);
-
 		$linked_map = array();
 		$scanned    = 0;
+		$page       = 1;
 
-		foreach ( $posts as $post_id ) {
-			$post = get_post( $post_id );
+		do {
+			$query = new WP_Query(
+				array(
+					'post_type'              => $allowed_types,
+					'post_status'            => 'publish',
+					'posts_per_page'         => $batch_size,
+					'paged'                  => $page,
+					'fields'                 => 'ids',
+					'orderby'                => 'ID',
+					'order'                  => 'ASC',
+					'no_found_rows'          => true,
+					'update_post_meta_cache' => false,
+					'update_post_term_cache' => false,
+				)
+			);
 
-			if ( ! $post instanceof WP_Post ) {
-				continue;
-			}
+			foreach ( $query->posts as $post_id ) {
+				$post = get_post( $post_id );
 
-			// Check post-level exclusion.
-			if ( Lsm_Meta_Box::is_excluded( $post->ID ) ) {
-				continue;
-			}
+				if ( ! $post instanceof WP_Post ) {
+					continue;
+				}
 
-			$content    = apply_filters( 'the_content', $post->post_content );
-			$word_count = str_word_count( wp_strip_all_tags( $content ) );
+				// Check post-level exclusion.
+				if ( Lsm_Meta_Box::is_excluded( $post->ID ) ) {
+					continue;
+				}
 
-			if ( $word_count < $min_words ) {
-				continue;
-			}
+				$content    = apply_filters( 'the_content', $post->post_content );
+				$word_count = str_word_count( wp_strip_all_tags( $content ) );
 
-			$url     = (string) get_permalink( $post );
-			$results = $linker->preview( $content, $url );
+				if ( $word_count < $min_words ) {
+					continue;
+				}
 
-			if ( ! empty( $results['links'] ) ) {
-				foreach ( $results['links'] as $link ) {
-					$keyword_id = $this->find_keyword_id_by_text( $keyword_map, $link['keyword'] );
+				$url     = (string) get_permalink( $post );
+				$results = $linker->preview( $content, $url );
 
-					if ( '' !== $keyword_id ) {
-						if ( ! isset( $linked_map[ $keyword_id ] ) ) {
-							$linked_map[ $keyword_id ] = array();
+				if ( ! empty( $results['links'] ) ) {
+					foreach ( $results['links'] as $link ) {
+						$keyword_id = $this->find_keyword_id_by_text( $keyword_map, $link['keyword'] );
+
+						if ( '' !== $keyword_id ) {
+							if ( ! isset( $linked_map[ $keyword_id ] ) ) {
+								$linked_map[ $keyword_id ] = array();
+							}
+
+							$linked_map[ $keyword_id ][ $post->ID ] = $post->post_title;
 						}
-
-						$linked_map[ $keyword_id ][ $post->ID ] = $post->post_title;
 					}
 				}
+
+				++$scanned;
 			}
 
-			++$scanned;
-		}
+			++$page;
+		} while ( count( $query->posts ) === $batch_size );
+
+		wp_reset_postdata();
 
 		$this->keywords->save_linked_posts( $linked_map );
 

@@ -112,7 +112,7 @@ class Lsm_Notifications {
 
 		// Broken URLs.
 		foreach ( $health_data as $url => $result ) {
-			if ( isset( $result['status'] ) && 'broken' === $result['status'] ) {
+			if ( isset( $result['status'] ) && 'error' === $result['status'] ) {
 				$broken_urls[] = $url;
 			}
 		}

@@ -1125,6 +1125,13 @@
 		for ( var i = 0; i < rows.length; i++ ) {
 			rows[ i ].addEventListener( 'click', handleAnalyticsRowClick );
 		}
+
+		// Expand All / Collapse All button.
+		var expandBtn = document.querySelector( '.lsm-expand-all-btn' );
+
+		if ( expandBtn ) {
+			expandBtn.addEventListener( 'click', handleExpandAllClick );
+		}
 	}
 
 	/**
@@ -1153,6 +1160,72 @@
 			detailRow.style.display = 'none';
 			row.classList.remove( 'lsm-row-expanded' );
 		}
+
+		updateExpandAllLabel();
+	}
+
+	/**
+	 * Handle click on the "Expand All / Collapse All" button.
+	 */
+	function handleExpandAllClick() {
+		var btn        = document.querySelector( '.lsm-expand-all-btn' );
+		var detailRows = document.querySelectorAll( '.lsm-where-used-row' );
+		var parentRows = document.querySelectorAll( '.lsm-analytics-row.lsm-has-posts' );
+
+		if ( ! btn || ! detailRows.length ) {
+			return;
+		}
+
+		// If any row is collapsed, expand all; otherwise collapse all.
+		var hasCollapsed = false;
+
+		for ( var i = 0; i < detailRows.length; i++ ) {
+			if ( 'none' === detailRows[ i ].style.display ) {
+				hasCollapsed = true;
+				break;
+			}
+		}
+
+		for ( var j = 0; j < detailRows.length; j++ ) {
+			detailRows[ j ].style.display = hasCollapsed ? '' : 'none';
+		}
+
+		for ( var k = 0; k < parentRows.length; k++ ) {
+			if ( hasCollapsed ) {
+				parentRows[ k ].classList.add( 'lsm-row-expanded' );
+			} else {
+				parentRows[ k ].classList.remove( 'lsm-row-expanded' );
+			}
+		}
+
+		btn.textContent = hasCollapsed
+			? ( btn.getAttribute( 'data-collapse-text' ) || 'Collapse All' )
+			: ( btn.getAttribute( 'data-expand-text' ) || 'Expand All' );
+	}
+
+	/**
+	 * Update the Expand All / Collapse All button label based on current state.
+	 */
+	function updateExpandAllLabel() {
+		var btn        = document.querySelector( '.lsm-expand-all-btn' );
+		var detailRows = document.querySelectorAll( '.lsm-where-used-row' );
+
+		if ( ! btn || ! detailRows.length ) {
+			return;
+		}
+
+		var hasCollapsed = false;
+
+		for ( var i = 0; i < detailRows.length; i++ ) {
+			if ( 'none' === detailRows[ i ].style.display ) {
+				hasCollapsed = true;
+				break;
+			}
+		}
+
+		btn.textContent = hasCollapsed
+			? ( btn.getAttribute( 'data-expand-text' ) || 'Expand All' )
+			: ( btn.getAttribute( 'data-collapse-text' ) || 'Collapse All' );
 	}
 
 	/* ------------------------------------------------------------------

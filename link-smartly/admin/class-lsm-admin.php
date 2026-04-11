@@ -260,7 +260,7 @@ class Lsm_Admin {
 			'donate_link'     => 'https://www.paypal.com/paypalme/ahmessawy/10USD',
 			'requires'        => '6.3',
 			'tested'          => '7.0',
-			'requires_php'    => '7.4',
+			'requires_php'    => '8.0',
 			'downloaded'      => 0,
 			'last_updated'    => gmdate( 'Y-m-d' ),
 			'sections'        => array(

@@ -148,8 +148,9 @@ class Lsm_Rest {
 					'permission_callback' => array( $this, 'check_permissions' ),
 					'args'                => array(
 						'offset' => array(
-							'type'    => 'integer',
-							'default' => 0,
+							'type'              => 'integer',
+							'default'           => 0,
+							'sanitize_callback' => 'absint',
 						),
 					),
 				),

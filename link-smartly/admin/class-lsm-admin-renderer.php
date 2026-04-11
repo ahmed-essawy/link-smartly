@@ -538,6 +538,7 @@ class Lsm_Admin_Renderer {
 		?>
 		<div class="lsm-analytics-section">
 			<h2><?php esc_html_e( 'Link Analytics', 'link-smartly' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'These statistics track only links automatically inserted by Link Smartly. Manually added links in the post editor are not counted.', 'link-smartly' ); ?></p>
 
 			<?php if ( $scanned >= 0 ) : ?>
 				<div class="notice notice-success is-dismissible">
@@ -564,7 +565,8 @@ class Lsm_Admin_Renderer {
 				</div>
 				<div class="lsm-stat-card">
 					<span class="lsm-stat-number"><?php echo esc_html( (string) $total_links ); ?></span>
-					<span class="lsm-stat-label"><?php esc_html_e( 'Total Links Inserted', 'link-smartly' ); ?></span>
+					<span class="lsm-stat-label"><?php esc_html_e( 'Auto-Links Inserted', 'link-smartly' ); ?></span>
+					<span class="lsm-stat-sub"><?php esc_html_e( 'by plugin only', 'link-smartly' ); ?></span>
 				</div>
 				<div class="lsm-stat-card">
 					<span class="lsm-stat-number"><?php echo esc_html( (string) count( $unique_posts ) ); ?></span>
@@ -593,8 +595,15 @@ class Lsm_Admin_Renderer {
 			</div>
 
 			<?php if ( ! empty( $keywords ) ) : ?>
-				<h3><?php esc_html_e( 'Keywords by Performance', 'link-smartly' ); ?></h3>
-				<p class="description"><?php esc_html_e( 'Click a keyword row to see which posts it appears in.', 'link-smartly' ); ?></p>
+				<div class="lsm-analytics-table-header">
+					<div>
+						<h3><?php esc_html_e( 'Keywords by Performance', 'link-smartly' ); ?></h3>
+						<p class="description"><?php esc_html_e( 'Click a keyword row to see which posts it was auto-linked in.', 'link-smartly' ); ?></p>
+					</div>
+					<button type="button" class="button lsm-expand-all-btn" data-expand-text="<?php esc_attr_e( 'Expand All', 'link-smartly' ); ?>" data-collapse-text="<?php esc_attr_e( 'Collapse All', 'link-smartly' ); ?>">
+						<?php esc_html_e( 'Expand All', 'link-smartly' ); ?>
+					</button>
+				</div>
 				<table class="widefat striped lsm-analytics-table">
 					<thead>
 						<tr>
@@ -602,7 +611,7 @@ class Lsm_Admin_Renderer {
 							<th scope="col"><?php esc_html_e( 'Keyword', 'link-smartly' ); ?></th>
 							<th scope="col"><?php esc_html_e( 'URL', 'link-smartly' ); ?></th>
 							<th scope="col"><?php esc_html_e( 'Group', 'link-smartly' ); ?></th>
-							<th scope="col"><?php esc_html_e( 'Links', 'link-smartly' ); ?></th>
+							<th scope="col"><?php esc_html_e( 'Auto-Links', 'link-smartly' ); ?></th>
 							<th scope="col"><?php esc_html_e( 'Posts', 'link-smartly' ); ?></th>
 							<th scope="col"><?php esc_html_e( 'Max Uses', 'link-smartly' ); ?></th>
 							<th scope="col"><?php esc_html_e( 'Status', 'link-smartly' ); ?></th>
@@ -615,7 +624,12 @@ class Lsm_Admin_Renderer {
 						?>
 							<tr class="lsm-analytics-row <?php echo $post_count > 0 ? 'lsm-has-posts' : ''; ?>" data-keyword-id="<?php echo esc_attr( $entry['id'] ); ?>">
 								<td><?php echo esc_html( (string) ( $index + 1 ) ); ?></td>
-								<td><?php echo esc_html( $entry['keyword'] ); ?></td>
+								<td>
+									<?php if ( $post_count > 0 ) : ?>
+										<span class="lsm-expand-arrow">&#9656;</span>
+									<?php endif; ?>
+									<?php echo esc_html( $entry['keyword'] ); ?>
+								</td>
 								<td><code><?php echo esc_html( $entry['url'] ); ?></code></td>
 								<td><?php echo esc_html( $entry['group'] ?? '' ); ?></td>
 								<td><strong><?php echo esc_html( (string) ( $entry['link_count'] ?? 0 ) ); ?></strong></td>
@@ -645,6 +659,7 @@ class Lsm_Admin_Renderer {
 														</a>
 														<span class="lsm-post-id">(#<?php echo esc_html( (string) $pid ); ?>)</span>
 														<a href="<?php echo esc_url( (string) get_permalink( (int) $pid ) ); ?>" target="_blank" rel="noopener" class="lsm-view-link" aria-label="<?php esc_attr_e( 'View post', 'link-smartly' ); ?>">&#8599;</a>
+														<a href="<?php echo esc_url( add_query_arg( 'lsm_highlight', '1', (string) get_permalink( (int) $pid ) ) ); ?>" target="_blank" rel="noopener" class="lsm-highlight-link" aria-label="<?php esc_attr_e( 'View with highlights', 'link-smartly' ); ?>" title="<?php esc_attr_e( 'View with auto-links highlighted', 'link-smartly' ); ?>">&#128269;</a>
 													</li>
 												<?php endforeach; ?>
 											</ul>
@@ -724,6 +739,93 @@ class Lsm_Admin_Renderer {
 									<div class="lsm-dist-bar-container">
 										<div class="lsm-dist-bar" style="width: <?php echo esc_attr( (string) $bar_width ); ?>%;"></div>
 									</div>
+								</td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			<?php endif; ?>
+
+			<?php
+			// Auto-Links by Post — inverted view for per-post verification.
+			if ( ! empty( $linked_posts ) ) :
+				$posts_view = array();
+
+				foreach ( $linked_posts as $kw_id => $posts ) {
+					if ( ! is_array( $posts ) ) {
+						continue;
+					}
+
+					foreach ( $posts as $pid => $title ) {
+						if ( ! isset( $posts_view[ $pid ] ) ) {
+							$posts_view[ $pid ] = array(
+								'title'    => $title,
+								'keywords' => array(),
+							);
+						}
+
+						// Find the keyword entry for this ID.
+						foreach ( $keywords as $kw_entry ) {
+							if ( $kw_entry['id'] === $kw_id ) {
+								$posts_view[ $pid ]['keywords'][] = array(
+									'keyword' => $kw_entry['keyword'],
+									'url'     => $kw_entry['url'],
+								);
+								break;
+							}
+						}
+					}
+				}
+
+				// Sort by number of keywords descending.
+				uasort(
+					$posts_view,
+					static function ( array $a, array $b ): int {
+						return count( $b['keywords'] ) <=> count( $a['keywords'] );
+					}
+				);
+			?>
+				<h3><?php esc_html_e( 'Auto-Links by Post', 'link-smartly' ); ?></h3>
+				<p class="description"><?php esc_html_e( 'Shows which auto-links the plugin inserted in each post. Use the highlight button to visually verify links on the front end.', 'link-smartly' ); ?></p>
+				<table class="widefat striped lsm-posts-view-table">
+					<thead>
+						<tr>
+							<th scope="col">#</th>
+							<th scope="col"><?php esc_html_e( 'Post', 'link-smartly' ); ?></th>
+							<th scope="col"><?php esc_html_e( 'Auto-Links', 'link-smartly' ); ?></th>
+							<th scope="col"><?php esc_html_e( 'Keywords → URLs', 'link-smartly' ); ?></th>
+							<th scope="col"><?php esc_html_e( 'Actions', 'link-smartly' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php
+						$pv_index = 0;
+
+						foreach ( $posts_view as $pid => $pv_data ) :
+							++$pv_index;
+						?>
+							<tr>
+								<td><?php echo esc_html( (string) $pv_index ); ?></td>
+								<td>
+									<strong><?php echo esc_html( $pv_data['title'] ); ?></strong>
+									<span class="lsm-post-id">(#<?php echo esc_html( (string) $pid ); ?>)</span>
+								</td>
+								<td><span class="lsm-post-count-badge"><?php echo esc_html( (string) count( $pv_data['keywords'] ) ); ?></span></td>
+								<td>
+									<ul class="lsm-keyword-url-list">
+										<?php foreach ( $pv_data['keywords'] as $kw_info ) : ?>
+											<li>
+												<strong><?php echo esc_html( $kw_info['keyword'] ); ?></strong>
+												<span class="lsm-arrow">&rarr;</span>
+												<code><?php echo esc_html( $kw_info['url'] ); ?></code>
+											</li>
+										<?php endforeach; ?>
+									</ul>
+								</td>
+								<td class="lsm-pv-actions">
+									<a href="<?php echo esc_url( get_edit_post_link( (int) $pid ) ?? '' ); ?>" class="button button-small"><?php esc_html_e( 'Edit', 'link-smartly' ); ?></a>
+									<a href="<?php echo esc_url( (string) get_permalink( (int) $pid ) ); ?>" target="_blank" rel="noopener" class="button button-small"><?php esc_html_e( 'View', 'link-smartly' ); ?></a>
+									<a href="<?php echo esc_url( add_query_arg( 'lsm_highlight', '1', (string) get_permalink( (int) $pid ) ) ); ?>" target="_blank" rel="noopener" class="button button-small lsm-btn-highlight"><?php esc_html_e( 'Highlight', 'link-smartly' ); ?></a>
 								</td>
 							</tr>
 						<?php endforeach; ?>
@@ -1071,8 +1173,9 @@ class Lsm_Admin_Renderer {
 			return;
 		}
 
-		$links = $results['links'] ?? array();
-		$title = $results['title'] ?? '';
+		$links    = $results['links'] ?? array();
+		$title    = $results['title'] ?? '';
+		$excluded = ! empty( $results['excluded'] );
 		?>
 		<div class="lsm-preview-results">
 			<h3>
@@ -1089,14 +1192,19 @@ class Lsm_Admin_Renderer {
 			<?php if ( empty( $links ) ) : ?>
 				<div class="lsm-preview-empty">
 					<span class="dashicons dashicons-info-outline lsm-preview-empty-icon"></span>
-					<p><strong><?php esc_html_e( 'No auto-links would be inserted for this content.', 'link-smartly' ); ?></strong></p>
-					<p><?php esc_html_e( 'Possible reasons:', 'link-smartly' ); ?></p>
-					<ul>
-						<li><?php esc_html_e( 'The content is shorter than the minimum word count setting.', 'link-smartly' ); ?></li>
-						<li><?php esc_html_e( 'None of your keywords appear in the content.', 'link-smartly' ); ?></li>
-						<li><?php esc_html_e( 'Matching keywords are inside headings, existing links, or code blocks.', 'link-smartly' ); ?></li>
-						<li><?php esc_html_e( 'This post is excluded via the post-level setting.', 'link-smartly' ); ?></li>
-					</ul>
+					<?php if ( $excluded ) : ?>
+						<p><strong><?php esc_html_e( 'Auto-linking is disabled for this post, so no links will be inserted.', 'link-smartly' ); ?></strong></p>
+						<p><?php esc_html_e( 'Remove the post-level exclusion in the editor if you want Link Smartly to process this content.', 'link-smartly' ); ?></p>
+					<?php else : ?>
+						<p><strong><?php esc_html_e( 'No auto-links would be inserted for this content.', 'link-smartly' ); ?></strong></p>
+						<p><?php esc_html_e( 'Possible reasons:', 'link-smartly' ); ?></p>
+						<ul>
+							<li><?php esc_html_e( 'The content is shorter than the minimum word count setting.', 'link-smartly' ); ?></li>
+							<li><?php esc_html_e( 'None of your keywords appear in the content.', 'link-smartly' ); ?></li>
+							<li><?php esc_html_e( 'Matching keywords are inside headings, existing links, or code blocks.', 'link-smartly' ); ?></li>
+							<li><?php esc_html_e( 'This post is excluded via the post-level setting.', 'link-smartly' ); ?></li>
+						</ul>
+					<?php endif; ?>
 				</div>
 			<?php else : ?>
 				<div class="lsm-preview-summary">
